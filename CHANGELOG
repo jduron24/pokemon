@@ -1,0 +1,7 @@
+1/26/2023
+    I went ahead and went into the help room to see what the best way to approach on making the terrain. At fist I thought it was a good idea to start off with a structure but then the tutor told me not approach that way. Instead he told me to create a 2d array of the size and start with making the border and split the map into a region of 4. So far I have hard coded to split the terrain into 4 different quadurants. 
+    Plan: I plan on randomizing where the regions belong, as of right now they are hardcoded but randomized. Eventually I will put its own function to make things more readable. Maybe find a better way on creating the map as well.
+1/31/2023
+    I ended up finishing the assignment. The way I approached the problem was, that I did it layer by layer, so first was the short grass and after that I made each section have a random chance of spawning in either two different types of obstacles. For example there is a region with water and trees, another with short and tall grass. I had a couple of segmitation faults, which I figured out. After I implemented the regions, I got started with the roads and started with randomly generating where I wanted the road to start and end at each border. I then created a funciton to connect them. After connecting the roads I added in the pokemarts and pokecenter.
+
+
