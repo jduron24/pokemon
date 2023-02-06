@@ -1,6 +1,6 @@
-assignment1.01: assignment1.01.c
-	gcc assignment1.01.c -o assignment1.01
+pokemonGame: pokemonGame.c
+	gcc pokemonGame.c -o pokemonGame
 run:
-	./assignment1.01
+	./pokemonGame
 clean:
-	rm -rf assignment1.01
+	rm -rf pokemonGame

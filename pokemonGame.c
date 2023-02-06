@@ -188,9 +188,9 @@ int generateRegions(){
 
 
 
-int terrain(){// needs to be 80x24 and limiting the map to 21 
-    generateRegions();
-
+int terrain(){
+    int map[401][401];
+    map[200][200] = generateRegions();
     return 0;
 }
 
@@ -198,3 +198,7 @@ int main(int argc, char *argv[]){
 terrain();
 return 0;
 }
+
+
+// please update
+// token for github "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"
