@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <string.h>
 
 #define BORDER '%'
 #define TALL_GRASS ':'
@@ -9,6 +10,11 @@
 #define TREE '^'
 #define WATER '~'
 #define ROAD '#'
+
+
+struct border{
+    int east,west,north,south;
+};
 
 int printTerrain(char grid[21][80]){
     for(int i =0; i < 21;i++){
@@ -21,6 +27,7 @@ int printTerrain(char grid[21][80]){
 }
 
 int connectRoads(int borderNumA, int borderNumB, char terrain[21][80], int num){
+    
     srand(time(NULL));
     int randomNum = rand() % borderNumB +1;
     if(num == 1){// north(numA) and south(numB)
@@ -75,17 +82,19 @@ int connectRoads(int borderNumA, int borderNumB, char terrain[21][80], int num){
     return 0;
 }
 
-int generateRoad(char terrain[21][80]){
-int randNumNorthBorder;
+int generateRoad(char terrain[21][80], char *direction){// the parameter direction is going to be used for where I should still hold
+int randNumNorthBorder;// the previous value of the border
 int randNumSouthBorder;
 int randNumEastBorder;
 int randNumWestBorder;
+
 srand(time(NULL));
 
 randNumNorthBorder = rand() % 78 + 1;
 randNumSouthBorder = rand() % 78 + 1;
 randNumEastBorder = rand() % 19 + 1;
 randNumWestBorder = rand() % 19 + 1;
+
 
 terrain[0][randNumNorthBorder] = ROAD;
 terrain[20][randNumSouthBorder] = ROAD;
@@ -98,7 +107,7 @@ connectRoads(randNumWestBorder, randNumEastBorder, terrain,2);
 return 0;
 }
 
-int generateRegions(){
+int generateRegions(char *direction){// this parameter is here to send to the function generateRoad()
     char terrain[21][80];
     int randomNum;
     int spawnChance;
@@ -181,7 +190,7 @@ int generateRegions(){
         }
         
     }
-    generateRoad(terrain);
+    generateRoad(terrain, direction);
     printTerrain(terrain);
     return 0;
 }
@@ -190,7 +199,28 @@ int generateRegions(){
 
 int terrain(){
     int map[401][401];
-    map[200][200] = generateRegions();
+    char input[10];
+    int x, y;   
+    x = 200;
+    y = 200;
+
+    map[x][y] = generateRegions(input);
+    printf("[%d,%d]", x,y);
+    printf("enter a random num: ");
+    scanf("%s", input);
+    while (strcmp(input,"q") != 0)
+    {
+       
+        if(strcmp(input,"n") == 0){
+            map[x][y++] = generateRegions(input);
+        }
+        printf("[%d,%d]", x,y);
+        printf("enter a random num: ");
+        scanf("%s", input);
+    }
+    
+
+    
     return 0;
 }
 
