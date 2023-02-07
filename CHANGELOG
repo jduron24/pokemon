@@ -4,4 +4,6 @@
 1/31/2023
     I ended up finishing the assignment. The way I approached the problem was, that I did it layer by layer, so first was the short grass and after that I made each section have a random chance of spawning in either two different types of obstacles. For example there is a region with water and trees, another with short and tall grass. I had a couple of segmitation faults, which I figured out. After I implemented the regions, I got started with the roads and started with randomly generating where I wanted the road to start and end at each border. I then created a funciton to connect them. After connecting the roads I added in the pokemarts and pokecenter.
 
-
+2/6/2023
+    I jsut started the assignment and at first I was having difficulties with the scanf. It would'nt allow me to enter an input, so i went to the help room to see if they knew anything about it. They could'nt solve it and eventually I ran the program in my terminal and it worked perfectly fine there. I also figured out how to use git. I started to think of ideas on how I should tackle this assignment and I created a global structure, so we can save the previous end of the road.
+    

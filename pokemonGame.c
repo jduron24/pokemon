@@ -15,7 +15,7 @@
 struct border{
     int east,west,north,south;
 };
-
+struct border history;// I initialized a global structure so it can be modified in any function
 int printTerrain(char grid[21][80]){
     for(int i =0; i < 21;i++){
         for(int j = 0; j < 80;j++){
@@ -82,6 +82,8 @@ int connectRoads(int borderNumA, int borderNumB, char terrain[21][80], int num){
     return 0;
 }
 
+
+
 int generateRoad(char terrain[21][80], char *direction){// the parameter direction is going to be used for where I should still hold
 int randNumNorthBorder;// the previous value of the border
 int randNumSouthBorder;
@@ -90,11 +92,21 @@ int randNumWestBorder;
 
 srand(time(NULL));
 
+int tmp = history.north;
+
+
+
 randNumNorthBorder = rand() % 78 + 1;
 randNumSouthBorder = rand() % 78 + 1;
 randNumEastBorder = rand() % 19 + 1;
 randNumWestBorder = rand() % 19 + 1;
 
+
+if (strcmp(direction,"n") == 0){
+    randNumSouthBorder = tmp;
+}
+
+history.north = randNumNorthBorder;
 
 terrain[0][randNumNorthBorder] = ROAD;
 terrain[20][randNumSouthBorder] = ROAD;
