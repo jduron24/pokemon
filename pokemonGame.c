@@ -93,6 +93,9 @@ int randNumWestBorder;
 srand(time(NULL));
 
 int tmp = history.north;
+int tmp2 = history.east;
+int tmp3 = history.south;
+int tmp4 = history.west;
 
 
 
@@ -105,8 +108,21 @@ randNumWestBorder = rand() % 19 + 1;
 if (strcmp(direction,"n") == 0){
     randNumSouthBorder = tmp;
 }
+else if(strcmp(direction,"e") == 0){
+    randNumWestBorder = tmp2;
+}
+else if(strcmp(direction, "s") == 0){
+    randNumNorthBorder = tmp3;
+}
+else if(strcmp(direction,"w") == 0){
+    randNumEastBorder = tmp4;
+}
 
 history.north = randNumNorthBorder;
+history.east = randNumEastBorder;
+history.south = randNumSouthBorder;
+history.west = randNumWestBorder;
+
 
 terrain[0][randNumNorthBorder] = ROAD;
 terrain[20][randNumSouthBorder] = ROAD;
@@ -210,23 +226,48 @@ int generateRegions(char *direction){// this parameter is here to send to the fu
 
 
 int terrain(){
-    int map[401][401];
+    char map[401][401];
+    char curTerrain[21][80];
     char input[10];
     int x, y;   
     x = 200;
     y = 200;
+    int externalX, externalY;
+
 
     map[x][y] = generateRegions(input);
-    printf("[%d,%d]", x,y);
+    printf("[%d,%d]", externalX,externalY);
     printf("enter a random num: ");
     scanf("%s", input);
     while (strcmp(input,"q") != 0)
     {
-       
         if(strcmp(input,"n") == 0){
-            map[x][y++] = generateRegions(input);
+            if(map[x-1][y] != '\0'){
+                printTerrain(map[x][y]);// try fixing this, ask the question on why i get a warning and how I can check
+                // to see if that part of the array is empty and how to save a prevois array
+            }
+            else{
+            map[x--][y] = generateRegions(input);
+            externalY++;
+            }
         }
-        printf("[%d,%d]", x,y);
+        else if(strcmp(input,"e") == 0){
+            map[x][y++] = generateRegions(input);
+            externalX++;
+        }
+        else if(strcmp(input,"s") == 0){
+            map[x++][y] = generateRegions(input);
+            externalY--;
+        }
+        else if(strcmp(input, "w") == 0){
+            map[x][y--] = generateRegions(input);
+            externalX--;
+        }
+        else{
+            printf("Invalid input, Try again\n");
+        }
+       
+        printf("[%d,%d]", externalX,externalY);
         printf("enter a random num: ");
         scanf("%s", input);
     }
