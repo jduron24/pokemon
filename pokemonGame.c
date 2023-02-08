@@ -11,11 +11,27 @@
 #define WATER '~'
 #define ROAD '#'
 
+struct curMap{
+    char map[21][80];
+};
+
 
 struct border{
     int east,west,north,south;
 };
+
+typedef struct map{
+    char map[21][80];
+}map_t;
+
+typedef struct worldMap{
+    map_t **map;
+    int row, col;
+} world_t;
+
+
 struct border history;// I initialized a global structure so it can be modified in any function
+struct curMap test;
 int printTerrain(char grid[21][80]){
     for(int i =0; i < 21;i++){
         for(int j = 0; j < 80;j++){
@@ -25,6 +41,8 @@ int printTerrain(char grid[21][80]){
     }
     return 0;
 }
+
+
 
 int connectRoads(int borderNumA, int borderNumB, char terrain[21][80], int num){
     
@@ -136,6 +154,7 @@ return 0;
 }
 
 int generateRegions(char *direction){// this parameter is here to send to the function generateRoad()
+//int generateRegions(map_t *map)
     char terrain[21][80];
     int randomNum;
     int spawnChance;
@@ -220,6 +239,8 @@ int generateRegions(char *direction){// this parameter is here to send to the fu
     }
     generateRoad(terrain, direction);
     printTerrain(terrain);
+    
+
     return 0;
 }
 
@@ -234,22 +255,32 @@ int terrain(){
     y = 200;
     int externalX, externalY;
 
+    // MALLOC TESTING
+    world_t w;
+    
+    w.map = (map_t**)malloc(sizeof(map_t*)*401);
+    for (int i = 0; i < 401; i++)
+    {
+        w.map[i] = (map_t*)malloc(sizeof(map_t)*401);
+    }    
+    //FINISHED MALLOCING
+     
+     //w.map[200][200] = generateRegions(input);// test
+     //generateRegions(&w.map[200][200])
+   
 
     map[x][y] = generateRegions(input);
+
     printf("[%d,%d]", externalX,externalY);
     printf("enter a random num: ");
     scanf("%s", input);
     while (strcmp(input,"q") != 0)
     {
         if(strcmp(input,"n") == 0){
-            if(map[x-1][y] != '\0'){
-                printTerrain(map[x][y]);// try fixing this, ask the question on why i get a warning and how I can check
-                // to see if that part of the array is empty and how to save a prevois array
-            }
-            else{
+            
             map[x--][y] = generateRegions(input);
             externalY++;
-            }
+            
         }
         else if(strcmp(input,"e") == 0){
             map[x][y++] = generateRegions(input);
@@ -271,9 +302,6 @@ int terrain(){
         printf("enter a random num: ");
         scanf("%s", input);
     }
-    
-
-    
     return 0;
 }
 
