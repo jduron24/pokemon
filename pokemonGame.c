@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdbool.h> 
 #include <stdlib.h>
 #include <time.h>
 #include <string.h>
@@ -14,6 +15,7 @@
 
 struct border{
     int east,west,north,south;
+    bool lever;
     char direction[10];
 };
 
@@ -27,6 +29,7 @@ typedef struct worldMap{
     map_t **map;
     int *generated;
 } world_t;
+
 
 
 struct border history;// I initialized a global structure so it can be modified in any function
@@ -153,8 +156,13 @@ else if(strcmp(direction, "s") == 0){
     randNumNorthBorder1 = tmpT3;
 }
 else if(strcmp(direction,"w") == 0){
-    randNumEastBorder = tmp4;
 
+    if(history.lever == true){
+        randNumNorthBorder = history.north;// makes the maps above south borders its current border north
+        printf("\n");
+    }
+    randNumEastBorder = tmp4;
+   
     randNumEastBorder3 = tmpT4;
 }
 
@@ -281,12 +289,14 @@ int generateRegions(map_t *map){// this parameter is here to send to the functio
 }
 
 
+
 int terrain(){
     char input[10];
     int x, y;   
     x = 200;
     y = 200;
     int externalX = 0, externalY = 0;
+    bool switc;
 
     // MALLOC TESTING
     world_t w;
@@ -306,11 +316,17 @@ int terrain(){
     //printTerrain(&w.map[x][y]); // when i try printing this, it looks like it printed an invisble map
 
     // map[x][y] = generateRegions(input);   
-
-    printf("[%d,%d]", externalX,externalY);
+    //printf("This should be the orgins south gate the correct one should be %d = %d\n",history.south,w.map[x][y].south);
+    
+    printf("[%d,%d]\n", externalX,externalY);
+    w.map[x][y].north = history.north;
+    w.map[x][y].east = history.east;
+    w.map[x][y].south = history.south;
+    w.map[x][y].west = history.west;
     printf("North %d, East %d, West %d, South %d \n", history.north, history.east, history.west, history.south);
     printf("enter a direction: ");
     scanf("%s", history.direction);
+
     while (strcmp(history.direction,"q") != 0)
     {        
         if(strcmp(history.direction,"n") == 0){
@@ -358,9 +374,19 @@ int terrain(){
                 externalX--;
             }
             else{
-            y-=1;
-            generateRegions(&(w.map[x][y]));
-            externalX--;
+                y-=1;  
+                //test
+                if(w.map[x-1][y].generated == 1){
+                    printf("This is the first south border: %d\n", w.map[x-1][y].south);
+                    history.north = w.map[x-1][y].south;
+                    history.lever = true;
+                }
+                //test
+        
+                generateRegions(&(w.map[x][y]));
+                history.lever = false;
+                
+                externalX--;
             }
         }
         else{
@@ -368,9 +394,13 @@ int terrain(){
         }
        
         printf("[%d,%d]\n", externalX,externalY);
+        w.map[x][y].north = history.north;
+        w.map[x][y].east = history.east;
+        w.map[x][y].south = history.south;
+        w.map[x][y].west = history.west;
         printf("North %d, East %d, West %d, South %d \n", history.north, history.east, history.west, history.south);
-
         printf("enter a direction: ");
+
         scanf("%s", history.direction);
     }
     for (int i = 0; i < 401; i++){
