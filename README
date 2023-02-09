@@ -1,5 +1,2 @@
-This program is the first assignment starting the pokemon game. It generates a random terrain with 4 different region, water,
-forest,grass,rocks. It also generates two roads that go north and south, and east to west. 
-
-I created quite a few functions that work with eachother to build the terrain, I don't really like having long functions. The 
-only problems I ran into were sigmitation dumps and getting the regions into their proper space. I feel like I can make the code a lot more cleaner which is something I plan on working on.
+This prrgram builds off the last assignment, its supposeed to create a whole world with maps in each space. It's also supposed to 
+connect each map with eachother. It also introduces scanf, which allows the user to take in inputs and directs which way the user wants to go. There are a couple bugs, in my program, like when I get to the edge of the world. I do plan on fixing them as soon as possible just to have a good base for the next project.

@@ -17,6 +17,7 @@ struct border{
     int east,west,north,south;
     bool lever;
     char direction[10];
+    int userX, userY;
 };
 
 typedef struct map{
@@ -43,6 +44,7 @@ int printTerrain(/*char grid[21][80]*/ map_t *map){
     }
     return 0;
 }
+
 
 // int changeBorders(){
 
@@ -174,6 +176,7 @@ else if(strcmp(direction,"w") == 0){
     randNumEastBorder3 = tmpT4;
 }
 
+
 history.north = randNumNorthBorder;
 history.east = randNumEastBorder;
 history.south = randNumSouthBorder;
@@ -191,8 +194,66 @@ map->map[20][randNumSouthBorder] = ROAD;
 map->map[randNumWestBorder][0] = ROAD;
 map->map[randNumEastBorder][79] = ROAD;
 
+
 connectRoads(randNumNorthBorder, randNumSouthBorder, map->map,1);
 connectRoads(randNumWestBorder, randNumEastBorder, map->map,2);
+if(history.userX == 200 && history.userY == 200){
+    map->map[randNumEastBorder][79] = BORDER;
+    map->map[0][randNumNorthBorder] = BORDER;
+
+}
+else if(history.userY == 200 && history.userX == -200 ){
+    map->map[randNumWestBorder][0] = BORDER;
+    map->map[0][randNumNorthBorder] = BORDER;
+    
+ }
+
+else if(history.userY == -200 && history.userX == -200){
+    map->map[20][randNumSouthBorder] = BORDER;
+    map->map[randNumWestBorder][0] = BORDER;
+}
+else if(history.userY == -200 && history.userX == 200){
+    map->map[randNumEastBorder][79] = BORDER;
+    map->map[20][randNumSouthBorder] = BORDER;
+}
+else if(history.userX == 200){
+ map->map[randNumEastBorder][79] = BORDER;
+}
+else if(history.userY == -200){
+map->map[20][randNumSouthBorder] = BORDER;
+}
+else if(history.userX == -200){
+     map->map[randNumWestBorder][0] = BORDER;
+}
+else if(history.userY == 200){
+    map->map[0][randNumNorthBorder] = BORDER;
+}
+
+
+
+// else if(history.userX == 200 && history.userY == -200){
+//     map->map[20][randNumSouthBorder] = BORDER;
+//     map->map[randNumEastBorder][79] = BORDER;
+// }
+// else if(history.userX == -200 && history.userY == -200){
+//     map->map[20][randNumSouthBorder] = BORDER;
+//     map->map[randNumWestBorder][0] = BORDER;
+// }
+// else if(history.userY == 200){
+//     printf("HEARE");
+//     map->map[0][randNumNorthBorder] = BORDER;
+// }
+// else if (history.userX == 0)
+// {
+//     map->map[randNumEastBorder][79] = BORDER;
+// }
+// else if (history.userX == -200)
+// {
+//     map->map[randNumWestBorder][0] = BORDER;
+// }
+// else if(history.userY == -200){
+//     map->map[20][randNumSouthBorder] = ROAD;
+// }
 
 return 0;
 }
@@ -336,13 +397,16 @@ int terrain(){
     scanf("%s", history.direction);
 
     while (strcmp(history.direction,"q") != 0)
-    {        
-        if(strcmp(history.direction,"n") == 0){
+    {       
+       
+        if(strcmp(history.direction,"n") == 0 && x > 0){
+            history.userY+=1;
             //printf("Value of &: %d\n", &(w.map[x-1][y]));
             if(w.map[x-1][y].generated == 1){
                 x-=1;
+                printf("INTERNAL x: %d y: %d\n", x,y);//test
                 printTerrain(&(w.map[x][y]));
-                externalY--;
+                externalY++;
             }
             else{
             x-=1;
@@ -352,32 +416,48 @@ int terrain(){
                 history.lever = true;
             }
             // add a function that checks its surounding and change its border accordingly
+            printf("INTERNAL x: %d y: %d\n", x,y);//test
             generateRegions(&(w.map[x][y]));
-            externalY--;
+            externalY++;
             }
         }
-        else if(strcmp(history.direction,"e") == 0){
-            if(w.map[x][y+1].generated == 1){
+        else if(strcmp(history.direction,"e") == 0 && y<400){
+            history.userX+=1;
+            
+            if(y == 0){
                 y+=1;
+                printf("INTERNAL x: %d y: %d Hisory.userx: %d\n", x,y, history.userX);//test
+                generateRegions(&(w.map[x][y]));
+                history.lever = false;
+                externalX++;
+            }
+            else if(w.map[x][y+1].generated == 1){
+                y+=1;
+                printf("INTERNAL x: %d y: %d\n", x,y);//test
                 printTerrain(&(w.map[x][y]));
                 externalX++;
             }
+            
             else{
             y+=1;
+            
             if(w.map[x+1][y].generated == 1){
+                    printf("INTERNAL x: %d y: %d\n", x,y);//test
                     printf("This is the first norths border: %d\n", w.map[x+1][y].north);
                     history.south = w.map[x+1][y].north;
                     history.lever = true;
                 }
+            printf("INTERNAL x: %d y: %d\n", x,y);//test
             generateRegions(&(w.map[x][y]));
             externalX++;
             }
         }
-        else if(strcmp(history.direction,"s") == 0){
+        else if(strcmp(history.direction,"s") == 0 && x < 400){
+            history.userY-=1;
             if(w.map[x+1][y].generated == 1){
                 x+=1;
                 printTerrain(&(w.map[x][y]));
-                externalY++;
+                externalY--;
             }
             else{
             x+=1;
@@ -388,30 +468,141 @@ int terrain(){
                     history.lever = true;
                 }
             //test
+
+            printf("INTERNAL x: %d y: %d\n", x,y);//test
             generateRegions( &(w.map[x][y]));
-            externalY++;
+            externalY--;
             }
         }
-        else if(strcmp(history.direction, "w") == 0){
+        else if(strcmp(history.direction, "w") == 0 && y > 0){
+            history.userX-=1;
             if(w.map[x][y-1].generated == 1){
                 y-=1;
+                printf("INTERNAL x: %d y: %d\n", x,y);//test
                 printTerrain(&(w.map[x][y]));
                 externalX--;
             }
             else{
                 y-=1;  
                 //test
-                if(w.map[x-1][y].generated == 1){
+                if(x == 0){
+                    printf("INTERNAL x: %d y: %d Hisory.userx: %d\n", x,y, history.userX);//test
+                    generateRegions(&(w.map[x][y]));
+                    history.lever = false;
+                
+                    externalX--;
+                }
+                else if(w.map[x-1][y].generated == 1){
                     printf("This is the first south border: %d\n", w.map[x-1][y].south);
                     history.north = w.map[x-1][y].south;
                     history.lever = true;
+
+                    printf("INTERNAL x: %d y: %d\n", x,y);//test
+                    generateRegions(&(w.map[x][y]));
+                    history.lever = false;
+                
+                    externalX--;
                 }
+                else{
                 //test
-        
+                printf("INTERNAL x: %d y: %d Hisory.userx: %d\n", x,y, history.userX);//test
                 generateRegions(&(w.map[x][y]));
                 history.lever = false;
                 
                 externalX--;
+                }
+            }
+        }
+        else if(strcmp(history.direction,"f") == 0){
+            int xCord, yCord;
+            printf("Where would you like to go?  'x y' \n");
+            scanf("%d %d", &xCord, &yCord);
+            
+
+            
+            if(xCord > 200 || yCord >200 || xCord < -200 || yCord < -200){
+                printf("Error, out of bounds\n");
+            }
+            // else if (xCord == 0 && yCord == 0){
+            //     y += xCord;
+            //     x += yCord;
+            //     externalX = xCord;
+            //     externalY = yCord;
+                
+            //     printf(" x: %d y: %d\n", x,y);
+
+            //     generateRegions(&(w.map[xCord][yCord]));
+                
+            // }
+            if(xCord < 0 && yCord >0){
+                x = 200;
+                y = 200;
+                y += xCord;
+                x -= yCord;
+                
+                externalX = xCord;
+                externalY = yCord;  
+                history.userX = xCord;
+                history.userY = yCord; 
+
+                printf("INTERNAL x: %d y: %d\n", x,y);
+                printf("EXTERNAL x: %d y: %d\n", externalX,externalY);
+                generateRegions(&(w.map[x][y]));
+            }
+            else if (xCord < 0 && yCord <0){
+                x = 200;
+                y = 200;
+                y += xCord;
+                x -= yCord;
+                
+                externalX = xCord;
+                externalY = yCord;  
+                history.userX = xCord;
+                history.userY = yCord; 
+
+                printf("INTERNAL x: %d y: %d\n", x,y);
+                printf("EXTERNAL x: %d y: %d\n", externalX,externalY);
+                generateRegions(&(w.map[x][y]));
+            }
+            else if(xCord > 0 && yCord < 0){
+                x = 200;
+                y = 200;
+                y += xCord;
+                x -= yCord;
+                externalX = xCord;
+                externalY = yCord;  
+                history.userX = xCord;
+                history.userY = yCord; 
+
+                printf("INTERNAL x: %d y: %d\n", x,y);
+                printf("EXTERNAL x: %d y: %d\n", externalX,externalY);
+                generateRegions(&(w.map[x][y]));
+            }
+            else if(yCord > 0){
+                 x= 200;
+                 y = 200;
+                 x -= yCord;
+                 y+= xCord;
+                externalX = yCord;
+                externalY = xCord;  
+                history.userX = xCord;
+                history.userY = yCord; 
+                printf("INTERNAL x: %d y: %d\n", x,y);
+                printf("EXTERNAL x: %d y: %d\n", externalX,externalY);
+                generateRegions(&(w.map[x][y]));
+            }
+            else{
+            x= 200;
+            y = 200;
+            y += xCord;
+            x += yCord;
+            externalX = yCord;
+            externalY = xCord;  
+            history.userX = xCord;
+            history.userY = yCord; 
+            printf("INTERNAL x: %d y: %d  history.userx: %d\n", x,y,history.userX);
+            printf("EXTERNAL x: %d y: %d\n", externalX,externalY);
+            generateRegions(&(w.map[x][y]));
             }
         }
         else{
