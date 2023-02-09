@@ -140,17 +140,26 @@ int randNumWestBorder4 = rand() % 19 + 1;
 
 
 if (strcmp(direction,"n") == 0){
+    if(history.lever == true){
+        randNumEastBorder = history.east;
+    }
     randNumSouthBorder = tmp;
 
     randNumSouthBorder2 = tmpT;
 
 }
 else if(strcmp(direction,"e") == 0){
+    if(history.lever == true){
+        randNumSouthBorder = history.south;
+    }
     randNumWestBorder = tmp2;
     
     randNumWestBorder4 = tmpT2;
 }
 else if(strcmp(direction, "s") == 0){
+    if(history.lever == true){
+        randNumWestBorder = history.west;
+    }
     randNumNorthBorder = tmp3;
 
     randNumNorthBorder1 = tmpT3;
@@ -158,8 +167,7 @@ else if(strcmp(direction, "s") == 0){
 else if(strcmp(direction,"w") == 0){
 
     if(history.lever == true){
-        randNumNorthBorder = history.north;// makes the maps above south borders its current border north
-        printf("\n");
+        randNumNorthBorder = history.north;
     }
     randNumEastBorder = tmp4;
    
@@ -338,6 +346,11 @@ int terrain(){
             }
             else{
             x-=1;
+            if(w.map[x][y+1].generated == 1){
+                printf("This is the first west border: %d\n", w.map[x][y+1].west);
+                history.east = w.map[x][y+1].west;
+                history.lever = true;
+            }
             // add a function that checks its surounding and change its border accordingly
             generateRegions(&(w.map[x][y]));
             externalY--;
@@ -351,6 +364,11 @@ int terrain(){
             }
             else{
             y+=1;
+            if(w.map[x+1][y].generated == 1){
+                    printf("This is the first norths border: %d\n", w.map[x+1][y].north);
+                    history.south = w.map[x+1][y].north;
+                    history.lever = true;
+                }
             generateRegions(&(w.map[x][y]));
             externalX++;
             }
@@ -363,6 +381,13 @@ int terrain(){
             }
             else{
             x+=1;
+            //test
+            if(w.map[x][y-1].generated == 1){
+                    printf("This is the first east border: %d\n", w.map[x][y-1].east);
+                    history.west = w.map[x][y-1].east;
+                    history.lever = true;
+                }
+            //test
             generateRegions( &(w.map[x][y]));
             externalY++;
             }
