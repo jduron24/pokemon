@@ -34,7 +34,6 @@ typedef struct worldMap{
 
 
 struct border history;// I initialized a global structure so it can be modified in any function
-// struct curMap test;
 int printTerrain(/*char grid[21][80]*/ map_t *map){
     for(int i =0; i < 21;i++){
         for(int j = 0; j < 80;j++){
@@ -44,11 +43,6 @@ int printTerrain(/*char grid[21][80]*/ map_t *map){
     }
     return 0;
 }
-
-
-// int changeBorders(){
-
-// }
 
 int connectRoads(int borderNumA, int borderNumB, char terrain[21][80], int num){
     
@@ -229,37 +223,10 @@ else if(history.userY == 200){
     map->map[0][randNumNorthBorder] = BORDER;
 }
 
-
-
-// else if(history.userX == 200 && history.userY == -200){
-//     map->map[20][randNumSouthBorder] = BORDER;
-//     map->map[randNumEastBorder][79] = BORDER;
-// }
-// else if(history.userX == -200 && history.userY == -200){
-//     map->map[20][randNumSouthBorder] = BORDER;
-//     map->map[randNumWestBorder][0] = BORDER;
-// }
-// else if(history.userY == 200){
-//     printf("HEARE");
-//     map->map[0][randNumNorthBorder] = BORDER;
-// }
-// else if (history.userX == 0)
-// {
-//     map->map[randNumEastBorder][79] = BORDER;
-// }
-// else if (history.userX == -200)
-// {
-//     map->map[randNumWestBorder][0] = BORDER;
-// }
-// else if(history.userY == -200){
-//     map->map[20][randNumSouthBorder] = ROAD;
-// }
-
 return 0;
 }
 
 int generateRegions(map_t *map){// this parameter is here to send to the function generateRoad()
-//int generateRegions(map_t *map)
     int randomNum;
     int spawnChance;
     
@@ -287,11 +254,9 @@ int generateRegions(map_t *map){// this parameter is here to send to the functio
                 for(int j = 40; j < 79; j++){
                 spawnChance = rand() % 3 +1;
                 if(randomNum == 1 && spawnChance == 3){
-                    //terrain[i][j] = TALL_GRASS;
                     map->map[i][j] = TALL_GRASS;
                     }
                 else if(randomNum == 2 && spawnChance == 2){
-                    //terrain[i][j] = WATER;
                     map->map[i][j] = WATER;
                 }
                 }
@@ -304,11 +269,9 @@ int generateRegions(map_t *map){// this parameter is here to send to the functio
                     spawnChance = rand() % 3 +1;
                     if(randomNum == 1 && spawnChance == 2){
                         
-                        //terrain[i][j] = MOUNTAIN;
                         map->map[i][j] = MOUNTAIN;
                     }
                     else if(randomNum == 2 && spawnChance == 1){
-                        //terrain[i][j] = TREE;
                         map->map[i][j] = TREE;
                     }
                 }
@@ -321,12 +284,10 @@ int generateRegions(map_t *map){// this parameter is here to send to the functio
                 for(int j = 40; j < 79; j++){
                     spawnChance = rand() % 2 +1;
                     if(randomNum == 1 && spawnChance == 1){
-                        //terrain[i][j] = TREE;
                         map->map[i][j] = TREE;
                     }
                     else if (randomNum == 2 && spawnChance == 2)
                     {
-                        //terrain[i][j] = WATER;
                         map->map[i][j] = WATER;
                     }
                     
@@ -339,12 +300,10 @@ int generateRegions(map_t *map){// this parameter is here to send to the functio
                 for(int j = 1; j < 40; j++){
                     spawnChance = rand() % 3 +1;
                     if(randomNum == 1 && spawnChance == 2){
-                        //terrain[i][j] = GRASS;
                         map->map[i][j] = GRASS;
                     }
                     else if (randomNum == 2 && spawnChance == 3)
                     {
-                        //terrain[i][j] = TALL_GRASS;
                         map->map[i][j] = TALL_GRASS;
                     }
                 }
@@ -382,10 +341,6 @@ int terrain(){
     generateRegions(&(w.map[x][y]));// having problems saving the previous world and tryinng to keep it updating
     // I am calling the address of the center  of the world and putting it into the parameter and trying to save that world that
     // gets generated in that function. Having troubles calling and saving it 
-    //printTerrain(&w.map[x][y]); // when i try printing this, it looks like it printed an invisble map
-
-    // map[x][y] = generateRegions(input);   
-    //printf("This should be the orgins south gate the correct one should be %d = %d\n",history.south,w.map[x][y].south);
     
     printf("[%d,%d]\n", externalX,externalY);
     w.map[x][y].north = history.north;
@@ -523,17 +478,7 @@ int terrain(){
             if(xCord > 200 || yCord >200 || xCord < -200 || yCord < -200){
                 printf("Error, out of bounds\n");
             }
-            // else if (xCord == 0 && yCord == 0){
-            //     y += xCord;
-            //     x += yCord;
-            //     externalX = xCord;
-            //     externalY = yCord;
-                
-            //     printf(" x: %d y: %d\n", x,y);
-
-            //     generateRegions(&(w.map[xCord][yCord]));
-                
-            // }
+       
             if(xCord < 0 && yCord >0){
                 x = 200;
                 y = 200;
