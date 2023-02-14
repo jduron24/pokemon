@@ -13,6 +13,11 @@
 #define ROAD '#'
 
 
+
+typedef struct pc{
+    int x, y;// this will be the locations the characters will be at 
+}pc_location;
+
 struct border{
     int east,west,north,south;
     bool lever;
@@ -32,7 +37,7 @@ typedef struct worldMap{
 } world_t;
 
 
-
+struct pc pc_location;
 struct border history;// I initialized a global structure so it can be modified in any function
 int printTerrain(/*char grid[21][80]*/ map_t *map){
     for(int i =0; i < 21;i++){
