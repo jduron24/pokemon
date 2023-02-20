@@ -1,8 +1,15 @@
 #include <stdio.h>
 #include <stdbool.h> 
+#include <stdint.h>
 #include <stdlib.h>
-#include <time.h>
 #include <string.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <limits.h>
+#include <sys/time.h>
+#include <assert.h>
+
+#include "heap.c"
 
 #define BORDER '%'
 #define TALL_GRASS ':'
@@ -11,11 +18,46 @@
 #define TREE '^'
 #define WATER '~'
 #define ROAD '#'
+#define PC '@'
+#define MAP_Y 21
+#define MAP_X 80
+#define dim_y 1
+#define dim_x 0
+
+
+
+
+//new code start --------------
+
+#define mapxy(x, y) (m->map[y][x])
+#define heightxy(x, y) (m->height[y][x])
+#define heightpair(pair) (m->height[pair[dim_y]][pair[dim_x]])
+
+
+typedef struct path{
+  heap_node_t *hn;
+  uint8_t pos[2];
+  uint8_t from[2];
+  int32_t cost;
+}path_t;
+
+
+static int32_t path_cmp(const void *key, const void *with) {
+  return ((path_t *) key)->cost - ((path_t *) with)->cost;
+}
+
+typedef uint8_t pair_t[2];
+
+static int32_t edge_penalty(uint8_t x, uint8_t y)
+{
+  return (x == 1 || y == 1 || x == MAP_X - 2 || y == MAP_Y - 2) ? 2 : 1;
+}
+//new code end --------------
 
 
 
 typedef struct pc{
-    int x, y;// this will be the locations the characters will be at 
+    int x, y, lever;// this will be the locations the characters will be at 
 }pc_location;
 
 struct border{
@@ -29,6 +71,9 @@ typedef struct map{
     char map[21][80];
     int north, east, south, west;
     int generated;
+
+
+    uint8_t height[MAP_Y][MAP_X];// new code
 }map_t;
 
 typedef struct worldMap{
@@ -37,9 +82,115 @@ typedef struct worldMap{
 } world_t;
 
 
-struct pc pc_location;
+pc_location location; // This will keep track of the location at all times 
 struct border history;// I initialized a global structure so it can be modified in any function
-int printTerrain(/*char grid[21][80]*/ map_t *map){
+
+
+
+// DIJKSTRAS ALGORTIHM
+static void dijkstra_path(map_t *m, pair_t to)// parmeters will be from the position to the player
+{
+
+    // he had the cost up here 
+
+  static path_t path[MAP_Y][MAP_X], *p;// references the map from the world map
+  static uint32_t initialized = 0;
+  heap_t h;
+  uint32_t x, y;
+  int terrian_cost;
+
+  if (!initialized) {
+    for (y = 0; y < MAP_Y; y++) {
+      for (x = 0; x < MAP_X; x++) {
+        path[y][x].pos[dim_y] = y;
+        path[y][x].pos[dim_x] = x;
+      }
+    }
+    initialized = 1;
+  }
+  
+  for (y = 0; y < MAP_Y; y++) {
+    for (x = 0; x < MAP_X; x++) {
+      path[y][x].cost = INT_MAX;
+    }
+  }
+
+  path[to[dim_y]][to[dim_x]].cost = 0;
+
+  heap_init(&h, path_cmp, NULL);
+
+  for (y = 1; y < MAP_Y - 1; y++) {
+    for (x = 1; x < MAP_X - 1; x++) {
+        if(terrian_cost != INT_MAX){
+            path[y][x].hn = heap_insert(&h, &path[y][x]);
+        }
+        else{
+            p->hn = NULL;
+        }
+      path[y][x].hn = heap_insert(&h, &path[y][x]);
+    }
+  }
+
+  while ((p = heap_remove_min(&h))) {
+    p->hn = NULL;
+
+    if ((p->pos[dim_y] == to[dim_y]) && p->pos[dim_x] == to[dim_x]) {
+      for (x = to[dim_x], y = to[dim_y];
+           (x != to[dim_x]) || (y != to[dim_y]);
+           p = &path[y][x], x = p->from[dim_x], y = p->from[dim_y]) {
+        mapxy(x, y) = 3;
+        heightxy(x, y) = 0;
+      }
+      heap_delete(&h);
+      return;
+    }
+
+    if ((path[p->pos[dim_y] - 1][p->pos[dim_x]    ].hn) &&
+        (path[p->pos[dim_y] - 1][p->pos[dim_x]    ].cost >
+         ((p->cost + heightpair(p->pos)) *
+          edge_penalty(p->pos[dim_x], p->pos[dim_y] - 1)))) {
+      path[p->pos[dim_y] - 1][p->pos[dim_x]    ].cost =
+        ((p->cost + heightpair(p->pos)) *
+         edge_penalty(p->pos[dim_x], p->pos[dim_y] - 1));
+      heap_decrease_key_no_replace(&h, path[p->pos[dim_y] - 1]
+                                           [p->pos[dim_x]    ].hn);
+    }
+    if ((path[p->pos[dim_y]    ][p->pos[dim_x] - 1].hn) &&
+        (path[p->pos[dim_y]    ][p->pos[dim_x] - 1].cost >
+         ((p->cost + heightpair(p->pos)) *
+          edge_penalty(p->pos[dim_x] - 1, p->pos[dim_y])))) {
+      path[p->pos[dim_y]][p->pos[dim_x] - 1].cost =
+        ((p->cost + heightpair(p->pos)) *
+         edge_penalty(p->pos[dim_x] - 1, p->pos[dim_y]));
+      heap_decrease_key_no_replace(&h, path[p->pos[dim_y]    ]
+                                           [p->pos[dim_x] - 1].hn);
+    }
+    if ((path[p->pos[dim_y]    ][p->pos[dim_x] + 1].hn) &&
+        (path[p->pos[dim_y]    ][p->pos[dim_x] + 1].cost >
+         ((p->cost + heightpair(p->pos)) *
+          edge_penalty(p->pos[dim_x] + 1, p->pos[dim_y])))) {
+      path[p->pos[dim_y]][p->pos[dim_x] + 1].cost =
+        ((p->cost + heightpair(p->pos)) *
+         edge_penalty(p->pos[dim_x] + 1, p->pos[dim_y]));
+      heap_decrease_key_no_replace(&h, path[p->pos[dim_y]    ]
+                                           [p->pos[dim_x] + 1].hn);
+    }
+    if ((path[p->pos[dim_y] + 1][p->pos[dim_x]    ].hn) &&
+        (path[p->pos[dim_y] + 1][p->pos[dim_x]    ].cost >
+         ((p->cost + heightpair(p->pos)) *
+          edge_penalty(p->pos[dim_x], p->pos[dim_y] + 1)))) {
+      path[p->pos[dim_y] + 1][p->pos[dim_x]    ].cost =
+        ((p->cost + heightpair(p->pos)) *
+         edge_penalty(p->pos[dim_x], p->pos[dim_y] + 1));
+      heap_decrease_key_no_replace(&h, path[p->pos[dim_y] + 1]
+                                           [p->pos[dim_x]    ].hn);
+    }
+  }
+}
+// DIJKSTRAS ALGORTIHM
+
+
+int printTerrain( map_t *map){
     for(int i =0; i < 21;i++){
         for(int j = 0; j < 80;j++){
             printf("%c", map->map[i][j]);
@@ -48,6 +199,30 @@ int printTerrain(/*char grid[21][80]*/ map_t *map){
     }
     return 0;
 }
+
+int random_location_for_pc(int row, int col, map_t *map){// takes in the row and column it should be in 
+    int randomNum;
+    int randomX, randomY;
+    srand(time(NULL));
+    randomNum = rand() % 4+1;
+
+    if(randomNum == 1){
+        randomX = rand() % 30 + 1 ;
+        location.x = randomX;
+        map->map[row][randomX] = PC;// internally this changes the x axis 
+        location.y = row;
+        location.lever = 1;
+    }
+    else {
+        randomY = rand() % 10;
+        location.y = randomY;
+        map->map[randomY][col] = PC;// internally this gets the y axis 
+        location.x = col;
+        location.lever = 1;
+    }
+    return 0;
+}
+
 
 int connectRoads(int borderNumA, int borderNumB, char terrain[21][80], int num){
     
@@ -228,6 +403,7 @@ else if(history.userY == 200){
     map->map[0][randNumNorthBorder] = BORDER;
 }
 
+
 return 0;
 }
 
@@ -316,6 +492,10 @@ int generateRegions(map_t *map){// this parameter is here to send to the functio
         }
     }
     generateRoad(map, history.direction);
+    //should put our pc below 
+    if(location.lever != 1){// only runs if lever == 1
+    random_location_for_pc(history.west, history.north,map);
+    }
     printTerrain(map);
     map->generated = 1;
     return 0;
@@ -342,10 +522,13 @@ int terrain(){
     //FINISHED MALLOCING
      
      //w.map[200][200] = generateRegions(input);// test
+    pair_t to;
+    
     printf("original map\n");
-    generateRegions(&(w.map[x][y]));// having problems saving the previous world and tryinng to keep it updating
-    // I am calling the address of the center  of the world and putting it into the parameter and trying to save that world that
-    // gets generated in that function. Having troubles calling and saving it 
+    generateRegions(&(w.map[x][y]));
+
+    dijkstra_path(&(w.map[x][y]), to);
+
     
     printf("[%d,%d]\n", externalX,externalY);
     w.map[x][y].north = history.north;
@@ -375,7 +558,6 @@ int terrain(){
                 history.east = w.map[x][y+1].west;
                 history.lever = true;
             }
-            // add a function that checks its surounding and change its border accordingly
             printf("INTERNAL x: %d y: %d\n", x,y);//test
             generateRegions(&(w.map[x][y]));
             externalY++;
@@ -569,6 +751,7 @@ int terrain(){
 
         scanf("%s", history.direction);
     }
+
     for (int i = 0; i < 401; i++){
         free(w.map[i]);
     }
