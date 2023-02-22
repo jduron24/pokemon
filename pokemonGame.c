@@ -52,7 +52,7 @@ struct border history;// I initialized a global structure so it can be modified 
 
 
 // this is where I will put dijkstras
-#define MAX_NODES 1680
+#define MAX_NODES 1580
 #define MAX_EDGES 10000
 
 // Define a struct to represent an edge
@@ -134,14 +134,13 @@ void dijkstra(map_t *map,int start) {
     init_graph(&graph, 1580);
     
   //adds edges to every node, up to 8 edges for each node 
-    for(int i = 1; i < 19;i++){
-        for(int j = 1;j < 79;j++){
-            if(map->map[i][j] == BORDER || map->map[i][j] == TREE || map->map[i][j] == MOUNTAIN || map->map[i][j] == WATER ){
-                continue;
-            }
-            if(map->map[i][j+1] != BORDER && map->map[i][j+1] != TREE && map->map[i][j+1] != MOUNTAIN && map->map[i][j+1] != WATER){
+    for(int i = 1; i <= 19;i++){
+        for(int j = 1;j <= 78;j++){
+
+            if(map->map[i][j+1] != BORDER ||   map->map[i-1][j+1] != TREE || map->map[i-1][j+1] != WATER){
                 if(map->map[i][j+1] == GRASS || map->map[i][j+1] == ROAD){
                     add_edge(graph, i*j, i*(j+1), 10);
+                    
                 }   
                 else if(map->map[i][j+1] == PMart || map->map[i][j+1] == PCntr){
                     add_edge(graph,i*j, i*(j+1), 50);
@@ -150,7 +149,7 @@ void dijkstra(map_t *map,int start) {
                     add_edge(graph,i*j, i*(j+1), 15);
                 }
             }
-            if(map->map[i-1][j+1] != BORDER && map->map[i-1][j+1] != TREE && map->map[i-1][j+1] != MOUNTAIN && map->map[i-1][j+1] != WATER){
+            if(map->map[i-1][j+1] != BORDER || map->map[i-1][j+1] != TREE || map->map[i-1][j+1] != WATER){
                 if(map->map[i-1][j+1] == GRASS || map->map[i-1][j+1] == ROAD){
                     add_edge(graph, i*j, (i-1)*(j+1), 10);
                 }   
@@ -161,7 +160,7 @@ void dijkstra(map_t *map,int start) {
                     add_edge(graph,i*j, (i-1)*(j+1), 15);
                 }
             }
-            if(map->map[i-1][j] != BORDER && map->map[i-1][j] != TREE && map->map[i-1][j] != MOUNTAIN && map->map[i-1][j] != WATER){
+            if(map->map[i-1][j] != BORDER || map->map[i-1][j] != TREE  || map->map[i-1][j] != WATER){
                 if(map->map[i-1][j] == GRASS || map->map[i-1][j] == ROAD){
                     add_edge(graph, i*j, (i-1)*(j), 10);
                 }   
@@ -172,17 +171,61 @@ void dijkstra(map_t *map,int start) {
                     add_edge(graph,i*j, (i-1)*(j), 15);
                 }
             }
-            // if(map->map[i+1][j+1] != BORDER && map->map[i+1][j+1] != TREE && map->map[i+1][j+1] != MOUNTAIN && map->map[i+1][j+1] != WATER){
-            //     if(map->map[i+1][j+1] == GRASS || map->map[i+1][j+1] == ROAD){
-            //         add_edge(graph, i*j, (i+1)*(j+1), 10);
-            //     }   
-            //     else if(map->map[i+1][j+1] == PMart || map->map[i+1][j+1] == PCntr){
-            //         add_edge(graph,i*j, (i+1)*(j+1), 50);
-            //     }
-            //     else if(map->map[i+1][j+1] == MOUNTAIN || map->map[i+1][j+1] == TALL_GRASS){
-            //         add_edge(graph,i*j, (i+1)*(j+1), 15);
-            //     }
-            // }    
+            if(map->map[i+1][j+1] != BORDER || map->map[i+1][j+1] != TREE || map->map[i+1][j+1] != WATER){
+                if(map->map[i+1][j+1] == GRASS || map->map[i+1][j+1] == ROAD){
+                    add_edge(graph, i*j, (i+1)*(j+1), 10);
+                }   
+                else if(map->map[i+1][j+1] == PMart || map->map[i+1][j+1] == PCntr){
+                    add_edge(graph,i*j, (i+1)*(j+1), 50);
+                }
+                else if(map->map[i+1][j+1] == MOUNTAIN || map->map[i+1][j+1] == TALL_GRASS){
+                    add_edge(graph,i*j, (i+1)*(j+1), 15);
+                }
+            } 
+            if(map->map[i-1][j-1] != BORDER || map->map[i-1][j-1] != TREE || map->map[i-1][j-1] != WATER){
+                if(map->map[i-1][j-1] == GRASS || map->map[i-1][j-1] == ROAD){
+                    add_edge(graph, i*j, (i-1)*(j-1), 10);
+                }   
+                else if(map->map[i-1][j-1] == PMart || map->map[i-1][j-1] == PCntr){
+                    add_edge(graph,i*j, (i-1)*(j-1), 50);
+                }
+                else if(map->map[i-1][j-1] == MOUNTAIN || map->map[i-1][j-1] == TALL_GRASS){
+                    add_edge(graph,i*j, (i-1)*(j-1), 15);
+                }
+            } 
+            if(map->map[i][j-1] != BORDER || map->map[i][j-1] != TREE || map->map[i][j-1] != WATER){
+                if(map->map[i][j-1] == GRASS || map->map[i][j-1] == ROAD){
+                    add_edge(graph, i*j, (i)*(j-1), 10);
+                }   
+                else if(map->map[i][j-1] == PMart || map->map[i][j-1] == PCntr){
+                    add_edge(graph,i*j, (i)*(j-1), 50);
+                }
+                else if(map->map[i][j-1] == MOUNTAIN || map->map[i][j-1] == TALL_GRASS){
+                    add_edge(graph,i*j, (i)*(j-1), 15);
+                }
+            } 
+            if(map->map[i+1][j-1] != BORDER || map->map[i+1][j-1] != TREE || map->map[i+1][j-1] != WATER){
+                if(map->map[i+1][j-1] == GRASS || map->map[i+1][j-1] == ROAD){
+                    add_edge(graph, i*j, (i+1)*(j-1), 10);
+                }   
+                else if(map->map[i+1][j-1] == PMart || map->map[i+1][j-1] == PCntr){
+                    add_edge(graph,i*j, (i+1)*(j-1), 50);
+                }
+                else if(map->map[i+1][j-1] == MOUNTAIN || map->map[i+1][j-1] == TALL_GRASS){
+                    add_edge(graph,i*j, (i+1)*(j-1), 15);
+                }
+            } 
+            if(map->map[i+1][j] != BORDER || map->map[i+1][j] != TREE  || map->map[i+1][j] != WATER){
+                if(map->map[i+1][j] == GRASS || map->map[i+1][j] == ROAD){
+                    add_edge(graph, i*j, (i+1)*(j), 10);
+                }   
+                else if(map->map[i+1][j] == PMart || map->map[i+1][j] == PCntr){
+                    add_edge(graph,i*j, (i+1)*(j), 50);
+                }
+                else if(map->map[i+1][j] == MOUNTAIN || map->map[i+1][j] == TALL_GRASS){
+                    add_edge(graph,i*j, (i+1)*(j), 15);
+                }
+            }
             
         }
     }
@@ -192,7 +235,7 @@ void dijkstra(map_t *map,int start) {
     // Set the distance to the start node as 0
     graph[start].distance = 0;
 
-    printf("num edges at by charcter: %d\n", graph[start].num_edges);
+    printf("num edges at by charcter: %d\n", graph[start].edges->weight)    ;
 
     // Initialize the priority queue
     PriorityQueue queue;
@@ -215,7 +258,7 @@ void dijkstra(map_t *map,int start) {
         graph[node].visited = 1;
         
         // Update the distances to the neighbors of the current node
-        for (int i = 0; i < graph[node].num_edges; i++) {
+        for (int i = 0; i < graph[node].num_edges && i < 9 ; i++) {
 
             Edge edge = graph[node].edges[i];
             int neighbor = edge.dest;
@@ -230,16 +273,20 @@ void dijkstra(map_t *map,int start) {
         }
 
     }
+    printf("\t");
     for(int i = 0; i < 1580; i++){
+    
         if(i %79 == 0 && i != 0){
-            printf("%.2df \n", graph[i].distance % 100);
+            printf("%.2df\n\t", graph[i].distance % 100);
         }
-        else if(graph[i].distance == INT_MAX || graph[i].distance == 0){
-            printf("  ");
-            continue;
+        else if(graph[i].distance == INT_MAX ){
+            printf("   ");
         }
-        printf("%.2d ", graph[i].distance % 100);
+        else{
+        printf("%.2d ", graph[i].distance);
+        }
     }
+
 
 }
 
