@@ -19,42 +19,8 @@
 #define WATER '~'
 #define ROAD '#'
 #define PC '@'
-#define MAP_Y 21
-#define MAP_X 80
-#define dim_y 1
-#define dim_x 0
-
-
-
-
-//new code start --------------
-
-#define mapxy(x, y) (m->map[y][x])
-#define heightxy(x, y) (m->height[y][x])
-#define heightpair(pair) (m->height[pair[dim_y]][pair[dim_x]])
-
-
-typedef struct path{
-  heap_node_t *hn;
-  uint8_t pos[2];
-  uint8_t from[2];
-  int32_t cost;
-}path_t;
-
-
-static int32_t path_cmp(const void *key, const void *with) {
-  return ((path_t *) key)->cost - ((path_t *) with)->cost;
-}
-
-typedef uint8_t pair_t[2];
-
-static int32_t edge_penalty(uint8_t x, uint8_t y)
-{
-  return (x == 1 || y == 1 || x == MAP_X - 2 || y == MAP_Y - 2) ? 2 : 1;
-}
-//new code end --------------
-
-
+#define PMart 'M'
+#define PCntr 'C'
 
 typedef struct pc{
     int x, y, lever;// this will be the locations the characters will be at 
@@ -72,8 +38,6 @@ typedef struct map{
     int north, east, south, west;
     int generated;
 
-
-    uint8_t height[MAP_Y][MAP_X];// new code
 }map_t;
 
 typedef struct worldMap{
@@ -87,107 +51,186 @@ struct border history;// I initialized a global structure so it can be modified 
 
 
 
-// DIJKSTRAS ALGORTIHM
-static void dijkstra_path(map_t *m, pair_t to)// parmeters will be from the position to the player
-{
+// this is where I will put dijkstras
+#define MAX_NODES 1680
+#define MAX_EDGES 10000
 
-    // he had the cost up here 
+// Define a struct to represent an edge
+typedef struct Edge {
+    int dest;
+    int weight;
+} Edge;
 
-  static path_t path[MAP_Y][MAP_X], *p;// references the map from the world map
-  static uint32_t initialized = 0;
-  heap_t h;
-  uint32_t x, y;
-  int terrian_cost;
+// Define a struct to represent a node
+typedef struct Node {
+    int visited;
+    int distance;
+    int c;
+    Edge edges[MAX_EDGES];
+    int num_edges;
+} Node;
 
-  if (!initialized) {
-    for (y = 0; y < MAP_Y; y++) {
-      for (x = 0; x < MAP_X; x++) {
-        path[y][x].pos[dim_y] = y;
-        path[y][x].pos[dim_x] = x;
-      }
-    }
-    initialized = 1;
-  }
-  
-  for (y = 0; y < MAP_Y; y++) {
-    for (x = 0; x < MAP_X; x++) {
-      path[y][x].cost = INT_MAX;
-    }
-  }
+// Define a struct to represent a priority queue entry
+typedef struct QueueEntry {
+    int node;
+    int priority;
+} QueueEntry;
 
-  path[to[dim_y]][to[dim_x]].cost = 0;
+// Define a struct to represent a priority queue
+typedef struct PriorityQueue {
+    QueueEntry entries[MAX_NODES];
+    int size;
+} PriorityQueue;
 
-  heap_init(&h, path_cmp, NULL);
-
-  for (y = 1; y < MAP_Y - 1; y++) {
-    for (x = 1; x < MAP_X - 1; x++) {
-        if(terrian_cost != INT_MAX){
-            path[y][x].hn = heap_insert(&h, &path[y][x]);
-        }
-        else{
-            p->hn = NULL;
-        }
-      path[y][x].hn = heap_insert(&h, &path[y][x]);
-    }
-  }
-
-  while ((p = heap_remove_min(&h))) {
-    p->hn = NULL;
-
-    if ((p->pos[dim_y] == to[dim_y]) && p->pos[dim_x] == to[dim_x]) {
-      for (x = to[dim_x], y = to[dim_y];
-           (x != to[dim_x]) || (y != to[dim_y]);
-           p = &path[y][x], x = p->from[dim_x], y = p->from[dim_y]) {
-        mapxy(x, y) = 3;
-        heightxy(x, y) = 0;
-      }
-      heap_delete(&h);
-      return;
-    }
-
-    if ((path[p->pos[dim_y] - 1][p->pos[dim_x]    ].hn) &&
-        (path[p->pos[dim_y] - 1][p->pos[dim_x]    ].cost >
-         ((p->cost + heightpair(p->pos)) *
-          edge_penalty(p->pos[dim_x], p->pos[dim_y] - 1)))) {
-      path[p->pos[dim_y] - 1][p->pos[dim_x]    ].cost =
-        ((p->cost + heightpair(p->pos)) *
-         edge_penalty(p->pos[dim_x], p->pos[dim_y] - 1));
-      heap_decrease_key_no_replace(&h, path[p->pos[dim_y] - 1]
-                                           [p->pos[dim_x]    ].hn);
-    }
-    if ((path[p->pos[dim_y]    ][p->pos[dim_x] - 1].hn) &&
-        (path[p->pos[dim_y]    ][p->pos[dim_x] - 1].cost >
-         ((p->cost + heightpair(p->pos)) *
-          edge_penalty(p->pos[dim_x] - 1, p->pos[dim_y])))) {
-      path[p->pos[dim_y]][p->pos[dim_x] - 1].cost =
-        ((p->cost + heightpair(p->pos)) *
-         edge_penalty(p->pos[dim_x] - 1, p->pos[dim_y]));
-      heap_decrease_key_no_replace(&h, path[p->pos[dim_y]    ]
-                                           [p->pos[dim_x] - 1].hn);
-    }
-    if ((path[p->pos[dim_y]    ][p->pos[dim_x] + 1].hn) &&
-        (path[p->pos[dim_y]    ][p->pos[dim_x] + 1].cost >
-         ((p->cost + heightpair(p->pos)) *
-          edge_penalty(p->pos[dim_x] + 1, p->pos[dim_y])))) {
-      path[p->pos[dim_y]][p->pos[dim_x] + 1].cost =
-        ((p->cost + heightpair(p->pos)) *
-         edge_penalty(p->pos[dim_x] + 1, p->pos[dim_y]));
-      heap_decrease_key_no_replace(&h, path[p->pos[dim_y]    ]
-                                           [p->pos[dim_x] + 1].hn);
-    }
-    if ((path[p->pos[dim_y] + 1][p->pos[dim_x]    ].hn) &&
-        (path[p->pos[dim_y] + 1][p->pos[dim_x]    ].cost >
-         ((p->cost + heightpair(p->pos)) *
-          edge_penalty(p->pos[dim_x], p->pos[dim_y] + 1)))) {
-      path[p->pos[dim_y] + 1][p->pos[dim_x]    ].cost =
-        ((p->cost + heightpair(p->pos)) *
-         edge_penalty(p->pos[dim_x], p->pos[dim_y] + 1));
-      heap_decrease_key_no_replace(&h, path[p->pos[dim_y] + 1]
-                                           [p->pos[dim_x]    ].hn);
-    }
-  }
+// Add an entry to the priority queue
+void push(PriorityQueue* queue, int node, int priority) {
+    QueueEntry entry = {node, priority};
+    queue->entries[queue->size++] = entry;
 }
-// DIJKSTRAS ALGORTIHM
+
+// Remove the entry with the highest priority from the priority queue
+int pop(PriorityQueue* queue) {
+    int min_priority = INT_MAX;
+    int min_index = -1;
+    for (int i = 0; i < queue->size; i++) {
+        if (queue->entries[i].priority < min_priority) {
+            min_priority = queue->entries[i].priority;
+            min_index = i;
+        }
+    }
+    int result = queue->entries[min_index].node;
+    queue->entries[min_index] = queue->entries[--queue->size];
+    return result;
+}
+
+// Initialize the priority queue
+void init_queue(PriorityQueue* queue) {
+    queue->size = 0;
+}
+
+// Check if the priority queue is empty
+int is_empty(PriorityQueue* queue) {
+    return queue->size == 0;
+}
+
+// Initialize all nodes in the graph
+void init_graph(Node** graph, int num_nodes) {
+    *graph = (Node*) malloc(num_nodes * sizeof(Node));
+    for (int i = 0; i < num_nodes; i++) {
+        (*graph)[i].distance = INT_MAX;
+        (*graph)[i].num_edges = 0;
+    }
+}
+
+// Add an edge to the graph
+void add_edge(Node* graph, int src, int dest, int weight) {
+    Edge edge = {dest, weight};
+    graph[src].edges[graph[src].num_edges++] = edge;
+}
+
+void dijkstra(map_t *map,int start) {
+    Node *graph;
+    // Initialize all nodes in the graph
+    init_graph(&graph, 1680);
+    
+  //adds edges to every node, up to 8 edges for each node 
+    for(int i = 1; i < 20;i++){
+        for(int j = 1;j < 79;j++){
+            if(map->map[i][j+1] != BORDER ){
+                if(map->map[i][j+1] == GRASS || map->map[i][j+1] == ROAD){
+                    add_edge(graph, i*j, i*(j+1), 10);
+                }   
+                else if(map->map[i][j+1] == PMart || map->map[i][j+1] == PCntr){
+                    add_edge(graph,i*j, i*(j+1), 50);
+                }
+                else if(map->map[i][j+1] == MOUNTAIN || map->map[i][j+1] == TALL_GRASS){
+                    add_edge(graph,i*j, i*(j+1), 15);
+                }
+            }
+            if(map->map[i-1][j+1] != BORDER){
+                if(map->map[i-1][j+1] == GRASS || map->map[i-1][j+1] == ROAD){
+                    add_edge(graph, i*j, (i-1)*(j+1), 10);
+                }   
+                else if(map->map[i-1][j+1] == PMart || map->map[i-1][j+1] == PCntr){
+                    add_edge(graph,i*j, (i-1)*(j+1), 50);
+                }
+                else if(map->map[i-1][j+1] == MOUNTAIN || map->map[i-1][j+1] == TALL_GRASS){
+                    add_edge(graph,i*j, (i-1)*(j+1), 15);
+                }
+            }
+            if(map->map[i-1][j] != BORDER){
+                if(map->map[i-1][j] == GRASS || map->map[i-1][j] == ROAD){
+                    add_edge(graph, i*j, (i-1)*(j), 10);
+                }   
+                else if(map->map[i-1][j] == PMart || map->map[i-1][j] == PCntr){
+                    add_edge(graph,i*j, (i-1)*(j), 50);
+                }
+                else if(map->map[i-1][j] == MOUNTAIN || map->map[i-1][j] == TALL_GRASS){
+                    add_edge(graph,i*j, (i-1)*(j), 15);
+                }
+            }
+            
+        }
+    }
+
+  
+    
+    // Set the distance to the start node as 0
+    graph[start].distance = 0;
+
+    printf("num edges at by charcter: %d ", graph[start].num_edges);
+
+    // Initialize the priority queue
+    PriorityQueue queue;
+    init_queue(&queue);
+    
+
+    push(&queue, start, 0);
+    
+    // Main loop
+    while (!is_empty(&queue)) {
+        // Get the node with the highest priority (i.e., smallest distance)
+
+        int node = pop(&queue);// this pops the start number first 
+        
+        // If we've already visited this node, skip it
+        if (graph[node].visited) {
+            continue;
+        }
+        // Mark the node as visited
+        graph[node].visited = 1;
+        
+        // Update the distances to the neighbors of the current node
+        for (int i = 0; i < graph[node].num_edges; i++) {
+
+            Edge edge = graph[node].edges[i];
+            int neighbor = edge.dest;
+            int weight = edge.weight;
+            int new_distance = graph[node].distance + weight;
+        
+        // If the new distance is smaller than the old distance, update the distance
+        if (new_distance < graph[neighbor].distance) {
+            graph[neighbor].distance = new_distance;
+            push(&queue, neighbor, new_distance);
+        }
+        }
+
+    }
+    for(int i = 0; i < 1680; i++){
+        if(i %80 == 0){
+            printf("\n");
+        }
+        else if(graph[i].distance == INT_MAX){
+            printf("  ");
+            continue;
+        }
+        printf("%.2d ", graph[i].distance % 100);
+    }
+
+}
+
+// The end of dijktras 
+
 
 
 int printTerrain( map_t *map){
@@ -245,8 +288,8 @@ int connectRoads(int borderNumA, int borderNumB, char terrain[21][80], int num){
     }
     }
     int randomNum = rand() % lengthFromOtherPath +1;
-    terrain[10][borderNumB] = 'C';
-    terrain[10][borderNumB+1] = 'C';
+    terrain[10][borderNumB] = PCntr;
+    terrain[10][borderNumB+1] = PCntr;
 
     for (int i = 11; i > 0; i--)
             {
@@ -269,8 +312,8 @@ int connectRoads(int borderNumA, int borderNumB, char terrain[21][80], int num){
             terrain[borderNumA+i][40] = ROAD;
     }
     }
-    terrain[borderNumA][40] = 'M';
-    terrain[borderNumA][41] = 'M';
+    terrain[borderNumA][40] = PMart;
+    terrain[borderNumA][41] = PMart;
     for(int i = 40; i < 79; i++ ){
         terrain[borderNumA - lengthFromOtherPath][i] = ROAD;
     }
@@ -522,12 +565,13 @@ int terrain(){
     //FINISHED MALLOCING
      
      //w.map[200][200] = generateRegions(input);// test
-    pair_t to;
     
     printf("original map\n");
     generateRegions(&(w.map[x][y]));
-
-    dijkstra_path(&(w.map[x][y]), to);
+    // dijkstras algo testing begins here
+    int src = location.x * location.y;
+    dijkstra(&(w.map[x][y]),src);
+    // dijkstras algo testing ends here 
 
     
     printf("[%d,%d]\n", externalX,externalY);
