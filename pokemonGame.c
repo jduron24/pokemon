@@ -131,12 +131,15 @@ void add_edge(Node* graph, int src, int dest, int weight) {
 void dijkstra(map_t *map,int start) {
     Node *graph;
     // Initialize all nodes in the graph
-    init_graph(&graph, 1680);
+    init_graph(&graph, 1580);
     
   //adds edges to every node, up to 8 edges for each node 
-    for(int i = 1; i < 20;i++){
+    for(int i = 1; i < 19;i++){
         for(int j = 1;j < 79;j++){
-            if(map->map[i][j+1] != BORDER ){
+            if(map->map[i][j] == BORDER || map->map[i][j] == TREE || map->map[i][j] == MOUNTAIN || map->map[i][j] == WATER ){
+                continue;
+            }
+            if(map->map[i][j+1] != BORDER && map->map[i][j+1] != TREE && map->map[i][j+1] != MOUNTAIN && map->map[i][j+1] != WATER){
                 if(map->map[i][j+1] == GRASS || map->map[i][j+1] == ROAD){
                     add_edge(graph, i*j, i*(j+1), 10);
                 }   
@@ -147,7 +150,7 @@ void dijkstra(map_t *map,int start) {
                     add_edge(graph,i*j, i*(j+1), 15);
                 }
             }
-            if(map->map[i-1][j+1] != BORDER){
+            if(map->map[i-1][j+1] != BORDER && map->map[i-1][j+1] != TREE && map->map[i-1][j+1] != MOUNTAIN && map->map[i-1][j+1] != WATER){
                 if(map->map[i-1][j+1] == GRASS || map->map[i-1][j+1] == ROAD){
                     add_edge(graph, i*j, (i-1)*(j+1), 10);
                 }   
@@ -158,7 +161,7 @@ void dijkstra(map_t *map,int start) {
                     add_edge(graph,i*j, (i-1)*(j+1), 15);
                 }
             }
-            if(map->map[i-1][j] != BORDER){
+            if(map->map[i-1][j] != BORDER && map->map[i-1][j] != TREE && map->map[i-1][j] != MOUNTAIN && map->map[i-1][j] != WATER){
                 if(map->map[i-1][j] == GRASS || map->map[i-1][j] == ROAD){
                     add_edge(graph, i*j, (i-1)*(j), 10);
                 }   
@@ -169,6 +172,17 @@ void dijkstra(map_t *map,int start) {
                     add_edge(graph,i*j, (i-1)*(j), 15);
                 }
             }
+            // if(map->map[i+1][j+1] != BORDER && map->map[i+1][j+1] != TREE && map->map[i+1][j+1] != MOUNTAIN && map->map[i+1][j+1] != WATER){
+            //     if(map->map[i+1][j+1] == GRASS || map->map[i+1][j+1] == ROAD){
+            //         add_edge(graph, i*j, (i+1)*(j+1), 10);
+            //     }   
+            //     else if(map->map[i+1][j+1] == PMart || map->map[i+1][j+1] == PCntr){
+            //         add_edge(graph,i*j, (i+1)*(j+1), 50);
+            //     }
+            //     else if(map->map[i+1][j+1] == MOUNTAIN || map->map[i+1][j+1] == TALL_GRASS){
+            //         add_edge(graph,i*j, (i+1)*(j+1), 15);
+            //     }
+            // }    
             
         }
     }
@@ -178,7 +192,7 @@ void dijkstra(map_t *map,int start) {
     // Set the distance to the start node as 0
     graph[start].distance = 0;
 
-    printf("num edges at by charcter: %d ", graph[start].num_edges);
+    printf("num edges at by charcter: %d\n", graph[start].num_edges);
 
     // Initialize the priority queue
     PriorityQueue queue;
@@ -216,11 +230,11 @@ void dijkstra(map_t *map,int start) {
         }
 
     }
-    for(int i = 0; i < 1680; i++){
-        if(i %80 == 0){
-            printf("\n");
+    for(int i = 0; i < 1580; i++){
+        if(i %79 == 0 && i != 0){
+            printf("%.2df \n", graph[i].distance % 100);
         }
-        else if(graph[i].distance == INT_MAX){
+        else if(graph[i].distance == INT_MAX || graph[i].distance == 0){
             printf("  ");
             continue;
         }
@@ -463,7 +477,7 @@ int generateRegions(map_t *map){// this parameter is here to send to the functio
             }
             else{
                 //terrain[i][j] = '.';
-                map->map[i][j] = '.';
+                map->map[i][j] = GRASS;
             }
             }
         }
