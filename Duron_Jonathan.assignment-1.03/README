@@ -1,6 +1,0 @@
-This programs runs the cost of the the rival and the Hiker. It did take me quite awhile to understand and refresh my
-mind with dijkstras, but I still don't think that I got the hang of it. at first I tried to use the prof code, but it 
-started to get a little to hard to understand. There are quite of few logic bugs, which hoepfully I can fox before TA's
-start to grade, but I beleive that I did implement the priority queue pretty well and I got a good undertstanding on 
-dijkstra algorithm. I did seek out a lot of help for this assignment, I would go to the help room often, but still 
-seemed like I could not get the hang of it. One thing is that you do have to keep make running this program if you want to see the cost.

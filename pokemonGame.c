@@ -52,7 +52,7 @@ struct border history;// I initialized a global structure so it can be modified 
 
 
 // this is where I will put dijkstras
-#define MAX_NODES 1580
+#define MAX_NODES 1482
 #define MAX_EDGES 10000
 
 // Define a struct to represent an edge
@@ -162,39 +162,44 @@ void add_edge(Node* graph, int src, int dest, int weight) {// check out num edge
 void dijkstra(map_t *map,int x, int y, int switc) {
     Node *graph;
     
-    int start = x*y;
-    
+    x--;
+    y--;
+    int start;
+    if(x == 0 || y == 0){
+      start = x +y;
+    }
+    else{
+    start = (x)+(y*78);
+    }
     // Initialize all nodes in the graph
-    init_graph(&graph, 1580);
+    init_graph(&graph, 1482);
     
     // Set the distance to the start node as 0
     graph[start].distance = 0;
     if(switc == 1){
     add_edge(graph, start, start + 1, getsCostForHiker(y, x + 1, map));
     add_edge(graph, start, start - 1, getsCostForHiker(y, x - 1, map));
-    add_edge(graph, start, start - 79, getsCostForHiker(y - 1, x, map));
-    add_edge(graph, start, start + 79, getsCostForHiker(y + 1, x, map));
-    add_edge(graph, start, start + 80, getsCostForHiker(y - 1, x + 1, map));
+    add_edge(graph, start, start - 78, getsCostForHiker(y - 1, x, map));
+    add_edge(graph, start, start + 78, getsCostForHiker(y + 1, x, map));
+    add_edge(graph, start, start + 79, getsCostForHiker(y - 1, x + 1, map));
     add_edge(graph, start, start + 78, getsCostForHiker(y - 1, x - 1, map));
-    add_edge(graph, start, start - 80, getsCostForHiker(y + 1, x - 1, map));
+    add_edge(graph, start, start - 79, getsCostForHiker(y + 1, x - 1, map));
     add_edge(graph, start, start - 78, getsCostForHiker(y + 1, x + 1, map));
     }
     else{
         add_edge(graph, start, start + 1, getsCostForRival(y, x + 1, map));
     add_edge(graph, start, start - 1, getsCostForRival(y, x - 1, map));
-    add_edge(graph, start, start - 79, getsCostForRival(y - 1, x, map));
-    add_edge(graph, start, start + 79, getsCostForRival(y + 1, x, map));
-    add_edge(graph, start, start + 80, getsCostForRival(y - 1, x + 1, map));
+    add_edge(graph, start, start - 78, getsCostForRival(y - 1, x, map));
+    add_edge(graph, start, start + 78, getsCostForRival(y + 1, x, map));
+    add_edge(graph, start, start + 79, getsCostForRival(y - 1, x + 1, map));
     add_edge(graph, start, start + 78, getsCostForRival(y - 1, x - 1, map));
-    add_edge(graph, start, start - 80, getsCostForRival(y + 1, x - 1, map));
+    add_edge(graph, start, start - 79, getsCostForRival(y + 1, x - 1, map));
     add_edge(graph, start, start - 78, getsCostForRival(y + 1, x + 1, map));
     }
     // Initialize the priority queue
     PriorityQueue queue;
     init_queue(&queue);
     push(&queue, start, 0);
-    
-
 
     // Main loop
     while (!is_empty(&queue)) { // restart most of the code and check if it is infinite and see what is there at that location 
@@ -226,7 +231,7 @@ void dijkstra(map_t *map,int x, int y, int switc) {
         // If the new distance is smaller than the old distance, update the distance
         if (new_distance < graph[neighbor].distance ) {
             graph[neighbor].distance = new_distance;
-            add_edge(graph, neighbor, neighbor+1, weight);
+           // add_edge(graph, neighbor, neighbor+1, weight);
             push(&queue, neighbor, new_distance);
         }
         }
@@ -234,13 +239,14 @@ void dijkstra(map_t *map,int x, int y, int switc) {
 
     }
     
-    for(int i = 0; i < 1580; i++){
+    printf("\nstart:\n");
+    for(int i = 0; i < 1482; i++){
     
-        if(i %79 == 0 && i != 0){
-            printf("%.2df\n", graph[i].distance % 100);
+        if(i %78  == 0 && i != 0){
+            printf("\n");
         }
         else if(graph[i].distance == INT_MAX ){
-            printf("   ");
+            printf("-1 ");
         }
         else{
         printf("%.2d ", graph[i].distance % 100);
