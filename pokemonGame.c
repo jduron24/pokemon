@@ -68,6 +68,7 @@ typedef struct Node {
     int c;
     Edge edges[8];
     int num_edges;
+    int weigh;
 } Node;
 
 // Define a struct to represent a priority queue entry
@@ -118,14 +119,33 @@ void init_graph(Node** graph, int num_nodes) {
     *graph = (Node*) malloc(num_nodes * sizeof(Node));
     for (int i = 0; i < num_nodes; i++) {
         (*graph)[i].distance = INT_MAX;
-        (*graph)[i].num_edges = 0;
+        (*graph)[i].num_edges = 8;
+        (*graph)[i].weigh = INT_MAX;
+
+
     }
 }
 
-int getsCostForHikerTest(int node, map_t *map){
-        int y,x;
-        y = node /78;
-        x = node % 78;
+// int getsCostForHikerTest(int node, map_t *map){
+//         int y,x;
+//         y = node /78;
+//         x = node % 78;
+//          if(map->map[y][x] == GRASS || map->map[y][x] == ROAD){
+//             return 10;
+//         }
+//         else if(map->map[y][x] == PMart || map->map[y][x] == PCntr){
+//             return 50;
+//         }
+//         else if(map->map[y][x] == TALL_GRASS || map->map[y][x] == MOUNTAIN){
+//             return 15;
+//         }
+//         else{
+//             return INT_MAX;
+//         }
+
+// }
+int getsCostForHikerTest(int y,int x, map_t *map){
+       
          if(map->map[y][x] == GRASS || map->map[y][x] == ROAD){
             return 10;
         }
@@ -163,13 +183,23 @@ void add_edge(Node* graph, int src, int dest, int weight) {// check out num edge
    
 }
 
+void add_weights(map_t *map, Node *graph){
+  int count = 0;
+  for(int i = 1; i < 19; i++){
+    for(int j = 1; j < 79;j++){
+      graph[count].weigh = getsCostForHikerTest(i,j,map);
+      count++;
+    }
+  }
+
+}
+
 void dijkstra(map_t *map,int x, int y, int switc) {
     Node *graph;
     
     x--;
     y--;
     int node;
-    int *ptr = &node;
     if(x == 0 || y == 0){
       node = x +y;
     }
@@ -178,35 +208,21 @@ void dijkstra(map_t *map,int x, int y, int switc) {
     }
     // Initialize all nodes in the graph
     init_graph(&graph, 1482);
-    
+
+    // add weights to each node 
+    add_weights(map, graph);
+
     // Set the distance to the start node as 0
     graph[node].distance = 0;
-    graph[node].num_edges = 8;
-    // if(switc == 1){
-    // add_edge(graph, start, start + 1, getsCostForHiker(y, x + 1, map));
-    // add_edge(graph, start, start - 1, getsCostForHiker(y, x - 1, map));
-    // add_edge(graph, start, start - 78, getsCostForHiker(y - 1, x, map));
-    // add_edge(graph, start, start + 78, getsCostForHiker(y + 1, x, map));
-    // add_edge(graph, start, start + 79, getsCostForHiker(y - 1, x + 1, map));
-    // add_edge(graph, start, start + 78, getsCostForHiker(y - 1, x - 1, map));
-    // add_edge(graph, start, start - 79, getsCostForHiker(y + 1, x - 1, map));
-    // add_edge(graph, start, start - 78, getsCostForHiker(y + 1, x + 1, map));
-    // }
-    // else{
-    //     add_edge(graph, start, start + 1, getsCostForRival(y, x + 1, map));
-    // add_edge(graph, start, start - 1, getsCostForRival(y, x - 1, map));
-    // add_edge(graph, start, start - 78, getsCostForRival(y - 1, x, map));
-    // add_edge(graph, start, start + 78, getsCostForRival(y + 1, x, map));
-    // add_edge(graph, start, start + 79, getsCostForRival(y - 1, x + 1, map));
-    // add_edge(graph, start, start + 78, getsCostForRival(y - 1, x - 1, map));
-    // add_edge(graph, start, start - 79, getsCostForRival(y + 1, x - 1, map));
-    // add_edge(graph, start, start - 78, getsCostForRival(y + 1, x + 1, map));
-    // }
+    graph[node].weigh = 0;
+
     // Initialize the priority queue
     PriorityQueue queue;
     init_queue(&queue);
     push(&queue, node, 0);
     int count = 0;
+    int weight;
+    int new_distance;
     // Main loop
     while (!is_empty(&queue)) { 
     // if its a tree, grass .. add the distance to its current positon
@@ -226,26 +242,101 @@ void dijkstra(map_t *map,int x, int y, int switc) {
         graph[node].visited = 1;
         
         // Update the distances to the neighbors of the current node
-        count = 0;
         for (int i = 0; i < graph[node].num_edges; i++) {
-          
-            Edge edge = graph[node].edges[i];
+            //Edge edge = graph[node].edges[i];
             
-            if(getsCostForHikerTest(node+1,map) != INT_MAX ){
-            edge.dest = node+1;
-            edge.weight= getsCostForHikerTest(node+1,map);
-            add_edge(graph,node,edge.dest,edge.weight);
-           
-            }
-            int neighbor = edge.dest;
-            int weight = edge.weight;
-            int new_distance = graph[node].distance + weight;  
-        // If the new distance is smaller than the old distance, update the distance
-        if (new_distance < graph[neighbor].distance ) {
-            graph[neighbor].distance = new_distance;
+            // int neighbor = edge.dest;
+            // int weight = edge.weight;
+
+            //int neighbor = graph[node+1].edges->dest;
+            if(i == 0){// x+1, y
+              int weight = graph[node+1].weigh;
+              int new_distance = graph[node].distance + weight;
+              
+              if (new_distance < graph[node+1].distance && graph[node-78].visited != 1) {
+              graph[node+1].distance = new_distance;
            // add_edge(graph, neighbor, neighbor+1, weight);
-            push(&queue, neighbor, new_distance);
-        }
+              push(&queue, node+1, new_distance);
+          
+              }  
+            }
+            // else if( i == 1){//x-1, y
+            //   int weight = graph[node-1].weigh;
+            //   int new_distance = graph[node].distance + weight;  
+
+            //   if (new_distance < graph[node-1].distance && graph[node-78].visited != 1) {
+            //   graph[node-1].distance = new_distance;
+            //   push(&queue, node-1, new_distance);
+            //   }  
+            // }
+            // else if( i == 2){ //x,y+1
+            //   int weight = graph[node-78].weigh;
+            //   int new_distance = graph[node].distance + weight; 
+              
+
+            //   if (new_distance < graph[node-78].distance && graph[node-78].visited != 1 ) {
+            //   graph[node-78].distance = new_distance;
+            //   push(&queue, node-78, new_distance);
+            //   }  
+            // }else if( i == 3){ //x,y-1
+            //   int weight = graph[node+78].weigh;
+            //   int new_distance = graph[node].distance + weight; 
+              
+
+            //   if (new_distance < graph[node+78].distance && graph[node+78].visited != 1 ) {
+            //   graph[node+78].distance = new_distance;
+            //   push(&queue, node+78, new_distance);
+            //   }  
+            // }
+            // else if( i == 4){ //x+1,y+1
+            //   int weight = graph[node-77].weigh;
+            //   int new_distance = graph[node].distance + weight; 
+              
+            //   if (new_distance < graph[node-77].distance && graph[node-77].visited != 1 ) {
+            //   graph[node-77].distance = new_distance;
+            //   push(&queue, node-77, new_distance);
+            //   }  
+            // }
+            // else if( i == 5){ //x-1,y-1
+            //   int weight = graph[node-79].weigh;
+            //   int new_distance = graph[node].distance + weight; 
+              
+            //   if (new_distance < graph[node-79].distance && graph[node-79].visited != 1 ) {
+            //   graph[node-79].distance = new_distance;
+            //   push(&queue, node-79, new_distance);
+            //   } 
+            // }
+            // else if( i == 6){ //x-1,y-1
+            //   int weight = graph[node+77].weigh;
+            //   int new_distance = graph[node].distance + weight; 
+              
+            //   if (new_distance < graph[node+77].distance && graph[node+77].visited != 1 ) {
+            //   graph[node+77].distance = new_distance;
+            //   push(&queue, node+77, new_distance);
+            //   }  
+            // }
+            // else if( i == 7){ //x+1,y+1
+            //   int weight = graph[node+79].weigh;
+            //   int new_distance = graph[node].distance + weight; 
+              
+            //   if (new_distance < graph[node+79].distance && graph[node+79].visited != 1 ) {
+            //   graph[node+79].distance = new_distance;
+            //   push(&queue, node+79, new_distance);
+            //   }  
+            // }
+
+            
+            // int weight = graph[node+1].weigh;
+            // int new_distance = graph[node].distance + weight;  
+
+        // If the new distance is smaller than the old distance, update the distance
+          // if (new_distance < graph[node+1].distance ) {
+          //     graph[node+1].distance = new_distance;
+          //  // add_edge(graph, neighbor, neighbor+1, weight);
+          //     push(&queue, node+1, new_distance);
+           
+            
+          // }
         }
         //}
 
@@ -257,7 +348,7 @@ void dijkstra(map_t *map,int x, int y, int switc) {
         if(i %78  == 0 && i != 0){
             printf("\n");
         }
-        else if(graph[i].distance == INT_MAX ){
+        else if(graph[i].distance < 0  ){
             printf("-1 ");
         }
         else{
