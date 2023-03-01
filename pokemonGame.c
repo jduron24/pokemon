@@ -122,20 +122,24 @@ void init_graph(Node** graph, int num_nodes) {
     }
 }
 
-int getsCostForHiker(int i, int j, map_t *map){
-        if(map->map[i][j] == GRASS || map->map[i][j] == ROAD){
+int getsCostForHikerTest(int node, map_t *map){
+        int y,x;
+        y = node /78;
+        x = node % 78;
+         if(map->map[y][x] == GRASS || map->map[y][x] == ROAD){
             return 10;
         }
-        else if(map->map[i][j] == PMart || map->map[i][j] == PCntr){
+        else if(map->map[y][x] == PMart || map->map[y][x] == PCntr){
             return 50;
         }
-        else if(map->map[i][j] == TALL_GRASS || map->map[i][j] == MOUNTAIN){
+        else if(map->map[y][x] == TALL_GRASS || map->map[y][x] == MOUNTAIN){
             return 15;
         }
         else{
             return INT_MAX;
         }
-}   
+
+}
 
 int getsCostForRival(int i, int j, map_t *map){
         if(map->map[i][j] == GRASS || map->map[i][j] == ROAD){
@@ -155,7 +159,7 @@ int getsCostForRival(int i, int j, map_t *map){
 // Add an edge to the graph
 void add_edge(Node* graph, int src, int dest, int weight) {// check out num edges, start there. At most should be 8
     Edge edge = {dest, weight};
-    graph[src].edges[graph[src].num_edges++] = edge;
+    graph[src].edges[graph[dest].num_edges++] = edge;
    
 }
 
@@ -164,49 +168,52 @@ void dijkstra(map_t *map,int x, int y, int switc) {
     
     x--;
     y--;
-    int start;
+    int node;
+    int *ptr = &node;
     if(x == 0 || y == 0){
-      start = x +y;
+      node = x +y;
     }
     else{
-    start = (x)+(y*78);
+      node = (x)+(y*78);
     }
     // Initialize all nodes in the graph
     init_graph(&graph, 1482);
     
     // Set the distance to the start node as 0
-    graph[start].distance = 0;
-    if(switc == 1){
-    add_edge(graph, start, start + 1, getsCostForHiker(y, x + 1, map));
-    add_edge(graph, start, start - 1, getsCostForHiker(y, x - 1, map));
-    add_edge(graph, start, start - 78, getsCostForHiker(y - 1, x, map));
-    add_edge(graph, start, start + 78, getsCostForHiker(y + 1, x, map));
-    add_edge(graph, start, start + 79, getsCostForHiker(y - 1, x + 1, map));
-    add_edge(graph, start, start + 78, getsCostForHiker(y - 1, x - 1, map));
-    add_edge(graph, start, start - 79, getsCostForHiker(y + 1, x - 1, map));
-    add_edge(graph, start, start - 78, getsCostForHiker(y + 1, x + 1, map));
-    }
-    else{
-        add_edge(graph, start, start + 1, getsCostForRival(y, x + 1, map));
-    add_edge(graph, start, start - 1, getsCostForRival(y, x - 1, map));
-    add_edge(graph, start, start - 78, getsCostForRival(y - 1, x, map));
-    add_edge(graph, start, start + 78, getsCostForRival(y + 1, x, map));
-    add_edge(graph, start, start + 79, getsCostForRival(y - 1, x + 1, map));
-    add_edge(graph, start, start + 78, getsCostForRival(y - 1, x - 1, map));
-    add_edge(graph, start, start - 79, getsCostForRival(y + 1, x - 1, map));
-    add_edge(graph, start, start - 78, getsCostForRival(y + 1, x + 1, map));
-    }
+    graph[node].distance = 0;
+    graph[node].num_edges = 8;
+    // if(switc == 1){
+    // add_edge(graph, start, start + 1, getsCostForHiker(y, x + 1, map));
+    // add_edge(graph, start, start - 1, getsCostForHiker(y, x - 1, map));
+    // add_edge(graph, start, start - 78, getsCostForHiker(y - 1, x, map));
+    // add_edge(graph, start, start + 78, getsCostForHiker(y + 1, x, map));
+    // add_edge(graph, start, start + 79, getsCostForHiker(y - 1, x + 1, map));
+    // add_edge(graph, start, start + 78, getsCostForHiker(y - 1, x - 1, map));
+    // add_edge(graph, start, start - 79, getsCostForHiker(y + 1, x - 1, map));
+    // add_edge(graph, start, start - 78, getsCostForHiker(y + 1, x + 1, map));
+    // }
+    // else{
+    //     add_edge(graph, start, start + 1, getsCostForRival(y, x + 1, map));
+    // add_edge(graph, start, start - 1, getsCostForRival(y, x - 1, map));
+    // add_edge(graph, start, start - 78, getsCostForRival(y - 1, x, map));
+    // add_edge(graph, start, start + 78, getsCostForRival(y + 1, x, map));
+    // add_edge(graph, start, start + 79, getsCostForRival(y - 1, x + 1, map));
+    // add_edge(graph, start, start + 78, getsCostForRival(y - 1, x - 1, map));
+    // add_edge(graph, start, start - 79, getsCostForRival(y + 1, x - 1, map));
+    // add_edge(graph, start, start - 78, getsCostForRival(y + 1, x + 1, map));
+    // }
     // Initialize the priority queue
     PriorityQueue queue;
     init_queue(&queue);
-    push(&queue, start, 0);
-
+    push(&queue, node, 0);
+    int count = 0;
     // Main loop
-    while (!is_empty(&queue)) { // restart most of the code and check if it is infinite and see what is there at that location 
+    while (!is_empty(&queue)) { 
     // if its a tree, grass .. add the distance to its current positon
         // Get the node with the highest priority (i.e., smallest distance)
 
-        int node = pop(&queue);// this pops the start number first 
+        node = pop(&queue);// this pops the start number first 
+    
 
         // If we've already visited this node, skip it
         if (graph[node].visited) {
@@ -219,15 +226,20 @@ void dijkstra(map_t *map,int x, int y, int switc) {
         graph[node].visited = 1;
         
         // Update the distances to the neighbors of the current node
+        count = 0;
         for (int i = 0; i < graph[node].num_edges; i++) {
-
+          
             Edge edge = graph[node].edges[i];
+            
+            if(getsCostForHikerTest(node+1,map) != INT_MAX ){
+            edge.dest = node+1;
+            edge.weight= getsCostForHikerTest(node+1,map);
+            add_edge(graph,node,edge.dest,edge.weight);
+           
+            }
             int neighbor = edge.dest;
             int weight = edge.weight;
-            int new_distance = graph[node].distance + weight;
-            // printf("num edge weight: %d ", graph[start].edges->weight);
-
-        
+            int new_distance = graph[node].distance + weight;  
         // If the new distance is smaller than the old distance, update the distance
         if (new_distance < graph[neighbor].distance ) {
             graph[neighbor].distance = new_distance;
@@ -240,7 +252,7 @@ void dijkstra(map_t *map,int x, int y, int switc) {
     }
     
     printf("\nstart:\n");
-    for(int i = 0; i < 1482; i++){
+    for(int i = 1; i < 1482; i++){
     
         if(i %78  == 0 && i != 0){
             printf("\n");
