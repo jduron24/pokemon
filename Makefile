@@ -1,6 +1,6 @@
-pokemonGame: pokemonGame.c
-	gcc pokemonGame.c -o pokemonGame
+poke327: poke327.c
+	gcc poke327.c -o poke327 
 run:
-	./pokemonGame
+	./poke327 3
 clean:
-	rm -rf pokemonGame
+	rm -rf poke327
