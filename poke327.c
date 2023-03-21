@@ -1853,8 +1853,15 @@ void init_ncurses(){
   int x,y;
 
   initscr();
+  while (true)
+  {
+  
+  printw("character y:%d, character x: %d\n",world.pc.pos[dim_y],world.pc.pos[dim_x] );
   for (y = 0; y < MAP_Y; y++) {
     for (x = 0; x < MAP_X; x++) {
+      if (world.cur_map->cmap[y][x]) {
+        addch(world.cur_map->cmap[y][x]->symbol);
+      } else {
       switch (world.cur_map->map[y][x]) {
         case ter_boulder:
           addch(BOULDER_SYMBOL);
@@ -1892,14 +1899,22 @@ void init_ncurses(){
         default:
           addch(ERROR_SYMBOL);
           break;
-  }
+      }
+      }
   } 
   } 
   int c = getch();
   if(c == 55){
-        
-        printw("7 is pressed\n");
-        
+    
+    printw("7 is pressed\n");
+    world.cur_map->cmap[world.pc.pos[dim_y]][world.pc.pos[dim_x]] = NULL;
+    world.pc.pos[dim_x] -=1;
+    world.pc.pos[dim_y] -= 1;
+    world.cur_map->cmap[world.pc.pos[dim_y]][world.pc.pos[dim_x]] = &world.pc;
+  }
+  clear();
+  refresh();
+
   }
   
   
@@ -1925,7 +1940,6 @@ int main(int argc, char *argv[])
   srand(seed);
 
   init_world();
-
 
   init_ncurses();
 
