@@ -6,6 +6,8 @@
 #include <sys/time.h>
 #include <assert.h>
 #include <unistd.h>
+#include <ncurses.h>
+
 
 #include "heap.h"
 
@@ -1521,6 +1523,7 @@ static void print_map()
   }
 }
 
+
 // The world is global because of its size, so init_world is parameterless
 void init_world()
 {
@@ -1779,6 +1782,8 @@ void pathfind(map_t *m)
   heap_delete(&h);
 }
 
+
+
 void print_hiker_dist()
 {
   int x, y;
@@ -1822,7 +1827,7 @@ void game_loop()
   character_t *c;
   pair_t d;
   
-  while (1) {
+  // while (1) {
     c = heap_remove_min(&world.cur_map->turn);
     //    print_character(c);
     if (c == &world.pc) {
@@ -1840,9 +1845,69 @@ void game_loop()
       c->pos[dim_x] = d[dim_x];
     }
     heap_insert(&world.cur_map->turn, c);
-  }
+  // }
 }
 
+
+void init_ncurses(){
+  int x,y;
+
+  initscr();
+  for (y = 0; y < MAP_Y; y++) {
+    for (x = 0; x < MAP_X; x++) {
+      switch (world.cur_map->map[y][x]) {
+        case ter_boulder:
+          addch(BOULDER_SYMBOL);
+          break;
+        case ter_mountain:
+          addch(MOUNTAIN_SYMBOL);
+          break;
+        case ter_tree:
+          addch(TREE_SYMBOL);
+          break;
+        case ter_forest:
+          addch(FOREST_SYMBOL);
+          break;
+        case ter_path:
+          addch(PATH_SYMBOL);
+          break;
+        case ter_gate:
+          addch(GATE_SYMBOL);
+          break;
+        case ter_mart:
+          addch(POKEMART_SYMBOL);
+          break;
+        case ter_center:
+          addch(POKEMON_CENTER_SYMBOL);
+          break;
+        case ter_grass:
+          addch(TALL_GRASS_SYMBOL);
+          break;
+        case ter_clearing:
+          addch(SHORT_GRASS_SYMBOL);
+          break;
+        case ter_water:
+          addch(WATER_SYMBOL);
+          break;
+        default:
+          addch(ERROR_SYMBOL);
+          break;
+  }
+  } 
+  } 
+  int c = getch();
+  if(c == 55){
+        
+        printw("7 is pressed\n");
+        
+  }
+  
+  
+  getch();
+  endwin();
+
+}
+ 
 int main(int argc, char *argv[])
 {
   struct timeval tv;
@@ -1856,11 +1921,18 @@ int main(int argc, char *argv[])
   }
 
   printf("Using seed: %u\n", seed);
+
   srand(seed);
 
   init_world();
 
-  game_loop();
+
+  init_ncurses();
+
+  // printf("%c\n", world.cur_map->cmap[20][20]);
+ 
+
+  // game_loop();  
   
   delete_world();
 
@@ -1868,3 +1940,5 @@ int main(int argc, char *argv[])
   
   return 0;
 }
+  
+///Users/jonathanduron/documents/gitrepo/spring23/coms327/pokemon
