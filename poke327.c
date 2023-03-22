@@ -573,6 +573,7 @@ void new_swimmer()
   } while (world.cur_map->map[pos[dim_y]][pos[dim_x]] != ter_water ||
            world.cur_map->cmap[pos[dim_y]][pos[dim_x]]);
 
+
   c = malloc(sizeof (*c));
   c->npc = malloc(sizeof (*c->npc));
   c->pos[dim_y] = pos[dim_y];
@@ -1831,7 +1832,7 @@ void game_loop()
     c = heap_remove_min(&world.cur_map->turn);
     //    print_character(c);
     if (c == &world.pc) {
-      print_map();
+      // print_map();
       usleep(250000);
       c->next_turn += move_cost[char_pc][world.cur_map->map[c->pos[dim_y]]
                                                            [c->pos[dim_x]]];
@@ -1848,12 +1849,221 @@ void game_loop()
   // }
 }
 
+void enterPM_PC(){//function to enter the pokemart or pokecenter
+  clear();
+  
+  printw("Press < to exit");
+  int c = getch();
+  while(c != 60){
+    c = getch();
+    
+  }
+}
+
+void get_location_from_pc(){
+  int y,x, c_x,c_y;
+  char character;
+  char *direction;
+  char *direction_x;
+  
+  for (y = 0; y < MAP_Y; y++) {
+    for (x = 0; x < MAP_X; x++) {
+      if (world.cur_map->cmap[y][x]) {
+        character = world.cur_map->cmap[y][x]->symbol;
+        if(character == PACER_SYMBOL){
+          c_x = x;
+          c_y = y;
+          
+          if(y < world.pc.pos[dim_y]){
+            direction = "north";
+            c_y = world.pc.pos[dim_y]-c_y;
+          }
+          else if(y  > world.pc.pos[dim_y]){
+            direction = "south";
+            c_y -= world.pc.pos[dim_y];
+          }
+          if(x < world.pc.pos[dim_x]){
+            direction_x = "west";
+            c_x = world.pc.pos[dim_x] - c_x;
+          }
+          else if(x > world.pc.pos[dim_x]){
+            direction_x = "east";
+            c_x -= world.pc.pos[dim_x]; 
+          }
+            printw("p, %d %s and %d %s\n", c_y, direction, c_x ,direction_x); 
+        }
+        else if (character == RIVAL_SYMBOL){
+          c_x = x;
+          c_y = y;
+          if(y < world.pc.pos[dim_y]){
+            direction = "north";
+            c_y = world.pc.pos[dim_y]-c_y;
+          }
+          else if(y  > world.pc.pos[dim_y]){
+            direction = "south";
+            c_y -= world.pc.pos[dim_y];
+          }
+          if(x < world.pc.pos[dim_x]){
+            direction_x = "west";
+            c_x = world.pc.pos[dim_x] - c_x;
+          }
+          else if(x > world.pc.pos[dim_x]){
+            direction_x = "east";
+            c_x -= world.pc.pos[dim_x]; 
+          }
+            printw("r, %d %s and %d %s\n", c_y, direction, c_x ,direction_x);   
+        }
+        else if (character == SWIMMER_SYMBOL){
+          c_x = x;
+          c_y = y;
+          if(y < world.pc.pos[dim_y]){
+            direction = "north";
+            c_y = world.pc.pos[dim_y]-c_y;
+          }
+          else if(y  > world.pc.pos[dim_y]){
+            direction = "south";
+            c_y -= world.pc.pos[dim_y];
+          }
+          if(x < world.pc.pos[dim_x]){
+            direction_x = "west";
+            c_x = world.pc.pos[dim_x] - c_x;
+          }
+          else if(x > world.pc.pos[dim_x]){
+            direction_x = "east";
+            c_x -= world.pc.pos[dim_x]; 
+          }
+            printw("m, %d %s and %d %s\n", c_y, direction, c_x ,direction_x); 
+        }
+        else if (character == HIKER_SYMBOL){
+          c_x = x;
+          c_y = y;
+          if(y < world.pc.pos[dim_y]){
+            direction = "north";
+            c_y = world.pc.pos[dim_y]-c_y;
+          }
+          else if(y  > world.pc.pos[dim_y]){
+            direction = "south";
+            c_y -= world.pc.pos[dim_y];
+          }
+          if(x < world.pc.pos[dim_x]){
+            direction_x = "west";
+            c_x = world.pc.pos[dim_x] - c_x;
+          }
+          else if(x > world.pc.pos[dim_x]){
+            direction_x = "east";
+            c_x -= world.pc.pos[dim_x]; 
+          }
+            printw("h, %d %s and %d %s\n", c_y, direction, c_x ,direction_x); 
+        }
+        else if (character == SENTRY_SYMBOL){
+          c_x = x;
+          c_y = y;
+          if(y < world.pc.pos[dim_y]){
+            direction = "north";
+            c_y = world.pc.pos[dim_y]-c_y;
+          }
+          else if(y  > world.pc.pos[dim_y]){
+            direction = "south";
+            c_y -= world.pc.pos[dim_y];
+          }
+          if(x < world.pc.pos[dim_x]){
+            direction_x = "west";
+            c_x = world.pc.pos[dim_x] - c_x;
+          }
+          else if(x > world.pc.pos[dim_x]){
+            direction_x = "east";
+            c_x -= world.pc.pos[dim_x]; 
+          }
+            printw("s, %d %s and %d %s\n", c_y, direction, c_x ,direction_x); 
+        }
+        else if (character == WANDERER_SYMBOL){
+          c_x = x;
+          c_y = y;
+          if(y < world.pc.pos[dim_y]){
+            direction = "north";
+            c_y = world.pc.pos[dim_y]-c_y;
+          }
+          else if(y  > world.pc.pos[dim_y]){
+            direction = "south";
+            c_y -= world.pc.pos[dim_y];
+          }
+          if(x < world.pc.pos[dim_x]){
+            direction_x = "west";
+            c_x = world.pc.pos[dim_x] - c_x;
+          }
+          else if(x > world.pc.pos[dim_x]){
+            direction_x = "east";
+            c_x -= world.pc.pos[dim_x]; 
+          }
+            printw("w, %d %s and %d %s\n", c_y, direction, c_x ,direction_x); 
+        }
+        else if (character == EXPLORER_SYMBOL){
+          c_x = x;
+          c_y = y;
+          if(y < world.pc.pos[dim_y]){
+            direction = "north";
+            c_y = world.pc.pos[dim_y]-c_y;
+          }
+          else if(y  > world.pc.pos[dim_y]){
+            direction = "south";
+            c_y -= world.pc.pos[dim_y];
+          }
+          if(x < world.pc.pos[dim_x]){
+            direction_x = "west";
+            c_x = world.pc.pos[dim_x] - c_x;
+          }
+          else if(x > world.pc.pos[dim_x]){
+            direction_x = "east";
+            c_x -= world.pc.pos[dim_x]; 
+          }
+            printw("e, %d %s and %d %s\n", c_y, direction, c_x ,direction_x); 
+        }
+      }
+    }
+  }
+}
+
+void display_trainers(){
+  clear();
+  printw("list of trainers\n");
+  int c ;
+  int y,x;
+  while(c != 27){
+    printw("trainers -------------------\n");
+    get_location_from_pc();
+
+    c = getch();
+  }
+}
+
+void battle_pc_vs_npc(){
+  int c;
+  if(world.cur_map->cmap[world.pc.pos[dim_y]][world.pc.pos[dim_x]]){
+    while(c != 27){
+    clear();
+    printw("Press escape");
+    c = getch();
+    }
+  }
+}
+
+
 
 void init_ncurses(){
-  int x,y;
+  int x,y,c;
 
   initscr();
-  while (true)
+  start_color();			/* Start color 			*/
+	init_pair(1, COLOR_WHITE, COLOR_BLACK);
+	init_pair(2, COLOR_YELLOW, COLOR_BLACK);  
+	init_pair(3, COLOR_RED, COLOR_BLACK);
+  init_pair(4,COLOR_MAGENTA,COLOR_BLACK);
+  init_pair(5,COLOR_GREEN,COLOR_BLACK);
+  init_pair(6,COLOR_BLUE,COLOR_BLACK);
+  
+  
+
+  while (c != 81)
   {
   
   printw("character y:%d, character x: %d\n",world.pc.pos[dim_y],world.pc.pos[dim_x] );
@@ -1864,37 +2074,64 @@ void init_ncurses(){
       } else {
       switch (world.cur_map->map[y][x]) {
         case ter_boulder:
-          addch(BOULDER_SYMBOL);
+          attron(COLOR_PAIR(1));
+          mvaddch(y, x,BOULDER_SYMBOL);
+          attroff(COLOR_PAIR(1));
+          //addch(BOULDER_SYMBOL);
           break;
         case ter_mountain:
-          addch(MOUNTAIN_SYMBOL);
+          attron(COLOR_PAIR(2));
+          mvaddch(y, x,MOUNTAIN_SYMBOL);
+          attroff(COLOR_PAIR(2));
+          // addch(MOUNTAIN_SYMBOL);
           break;
         case ter_tree:
-          addch(TREE_SYMBOL);
+          attron(COLOR_PAIR(1));
+          mvaddch(y, x,TREE_SYMBOL);
+          attroff(COLOR_PAIR(1));
+          // addch(TREE_SYMBOL);
           break;
         case ter_forest:
           addch(FOREST_SYMBOL);
           break;
         case ter_path:
-          addch(PATH_SYMBOL);
+          attron(COLOR_PAIR(4));
+          mvaddch(y, x,PATH_SYMBOL);
+          attroff(COLOR_PAIR(4));
+          // addch(PATH_SYMBOL);
           break;
         case ter_gate:
           addch(GATE_SYMBOL);
           break;
         case ter_mart:
+          attron(COLOR_PAIR(3));
+          mvaddch(y, x,POKEMART_SYMBOL);
+          attroff(COLOR_PAIR(3));
           addch(POKEMART_SYMBOL);
           break;
         case ter_center:
-          addch(POKEMON_CENTER_SYMBOL);
+          attron(COLOR_PAIR(3));
+          mvaddch(y, x,POKEMON_CENTER_SYMBOL);
+          attroff(COLOR_PAIR(3));
+          // addch(POKEMON_CENTER_SYMBOL);
           break;
         case ter_grass:
-          addch(TALL_GRASS_SYMBOL);
+          attron(COLOR_PAIR(5));
+          mvaddch(y, x,TALL_GRASS_SYMBOL);
+          attroff(COLOR_PAIR(5));
+          // addch(TALL_GRASS_SYMBOL);
           break;
         case ter_clearing:
-          addch(SHORT_GRASS_SYMBOL);
+          attron(COLOR_PAIR(5));
+          mvaddch(y, x,SHORT_GRASS_SYMBOL);
+          attroff(COLOR_PAIR(5));
+          // addch(SHORT_GRASS_SYMBOL);
           break;
         case ter_water:
-          addch(WATER_SYMBOL);
+          attron(COLOR_PAIR(6));
+          mvaddch(y, x,WATER_SYMBOL);
+          attroff(COLOR_PAIR(6));
+          // addch(WATER_SYMBOL);
           break;
         default:
           addch(ERROR_SYMBOL);
@@ -1903,15 +2140,88 @@ void init_ncurses(){
       }
   } 
   } 
-  int c = getch();
-  if(c == 55){
+  c = getch();
+  switch(c){
+    case 55:
+    case 121:
+      world.cur_map->cmap[world.pc.pos[dim_y]][world.pc.pos[dim_x]] = NULL;
+      world.pc.pos[dim_x] -=1;
+      world.pc.pos[dim_y] -= 1;
+      battle_pc_vs_npc();
+      world.cur_map->cmap[world.pc.pos[dim_y]][world.pc.pos[dim_x]] = &world.pc;
+      break;
+    case 56:
+    case 107:
+      world.cur_map->cmap[world.pc.pos[dim_y]][world.pc.pos[dim_x]] = NULL;
+      world.pc.pos[dim_y] -= 1;
+      battle_pc_vs_npc();
+      world.cur_map->cmap[world.pc.pos[dim_y]][world.pc.pos[dim_x]] = &world.pc;
+      break;
+    case 57:
+    case 117:
+      world.cur_map->cmap[world.pc.pos[dim_y]][world.pc.pos[dim_x]] = NULL;
+      world.pc.pos[dim_x] +=1;
+      world.pc.pos[dim_y] -= 1;
+      battle_pc_vs_npc();
+      world.cur_map->cmap[world.pc.pos[dim_y]][world.pc.pos[dim_x]] = &world.pc;
+      break;
+
+    case 54:
+    case 108:
+      world.cur_map->cmap[world.pc.pos[dim_y]][world.pc.pos[dim_x]] = NULL;
+      world.pc.pos[dim_x] +=1;
+      battle_pc_vs_npc();
+      world.cur_map->cmap[world.pc.pos[dim_y]][world.pc.pos[dim_x]] = &world.pc;
+      break;
+    case 51:
+    case 110:
+     world.cur_map->cmap[world.pc.pos[dim_y]][world.pc.pos[dim_x]] = NULL;
+      world.pc.pos[dim_x] +=1;
+      world.pc.pos[dim_y] += 1;
+      battle_pc_vs_npc();
+      world.cur_map->cmap[world.pc.pos[dim_y]][world.pc.pos[dim_x]] = &world.pc;
+      break;
+    case 50:
+    case 106:
+      world.cur_map->cmap[world.pc.pos[dim_y]][world.pc.pos[dim_x]] = NULL;
+      world.pc.pos[dim_y] +=1;
+      battle_pc_vs_npc();
+      world.cur_map->cmap[world.pc.pos[dim_y]][world.pc.pos[dim_x]] = &world.pc;
+      break;
+    case 49:
+    case 98:
+        world.cur_map->cmap[world.pc.pos[dim_y]][world.pc.pos[dim_x]] = NULL;
+        world.pc.pos[dim_x] -=1;
+        world.pc.pos[dim_y] += 1;
+      battle_pc_vs_npc();
+        world.cur_map->cmap[world.pc.pos[dim_y]][world.pc.pos[dim_x]] = &world.pc;
+        break;
+    case 52:
+    case 104:
+      world.cur_map->cmap[world.pc.pos[dim_y]][world.pc.pos[dim_x]] = NULL;
+      world.pc.pos[dim_x] -=1;
+      battle_pc_vs_npc();
+      world.cur_map->cmap[world.pc.pos[dim_y]][world.pc.pos[dim_x]] = &world.pc;
+      break;    
+    case 62:
+      if((world.cur_map->map[world.pc.pos[dim_y]][world.pc.pos[dim_x]] == ter_center) ||world.cur_map->map[world.pc.pos[dim_y]][world.pc.pos[dim_x]] == ter_mart){ 
+        enterPM_PC();
+      }
+      break;
+    case 53:
+    case 95:
+      break;
     
-    printw("7 is pressed\n");
-    world.cur_map->cmap[world.pc.pos[dim_y]][world.pc.pos[dim_x]] = NULL;
-    world.pc.pos[dim_x] -=1;
-    world.pc.pos[dim_y] -= 1;
-    world.cur_map->cmap[world.pc.pos[dim_y]][world.pc.pos[dim_x]] = &world.pc;
+    case 116:
+      display_trainers();
+      break;
+
+
+    default:
+      break;
   }
+  game_loop();
+  
   clear();
   refresh();
 
@@ -1946,7 +2256,9 @@ int main(int argc, char *argv[])
   // printf("%c\n", world.cur_map->cmap[20][20]);
  
 
-  // game_loop();  
+  // game_loop(); 
+  
+
   
   delete_world();
 
